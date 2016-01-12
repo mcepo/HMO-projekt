@@ -10,6 +10,8 @@ import java.util.List;
  */
 
 public class Algorithm {
+    
+    public Instance instance;
 
 // koji su sve ljudi raspoloživi u pojedinoj smjeni, neovisno o danu
     public LinkedList<LinkedList<Integer>> availableStaffForEachShift;
@@ -29,7 +31,10 @@ public class Algorithm {
 // za one smjene s najmanjom fleksibilnosti se prvo bitaju ljudi
     public List<Integer> dayShiftFlexibility;
     
-    public Algorithm() {
+    public Algorithm(Instance instance) {
+        
+        this.instance = instance;
+        
         this.availableStaffForEachShift = new LinkedList<>();
         this.availableStaffForEachDay = new LinkedList<>();
         this.availableStaffForEachDayShift = new LinkedList<>();
@@ -38,10 +43,10 @@ public class Algorithm {
 
     public void getAvailableStaffForEachShift () {
         
-        for( int j=0; j< Main.numberOfShiftsPerDay; j++) {
+        for( int j=0; j< this.instance.numberOfShiftsPerDay; j++) {
             LinkedList<Integer> availableStaffForShift = new LinkedList<>();
-            for(int i=0;i< Main.numberOfStaff;i++) {
-                if(Main.staff.get(i).maxShifts.get(j) == 0 ) { continue; }
+            for(int i=0;i< this.instance.numberOfStaff;i++) {
+                if(this.instance.staff.get(i).maxShifts.get(j) == 0 ) { continue; }
                 availableStaffForShift.add(i);
             }
             this.availableStaffForEachShift.add(availableStaffForShift);
@@ -50,10 +55,10 @@ public class Algorithm {
     
     public void getAvailableStaffForEachDay () {
         
-        for( int j=0; j< Main.numberOfDays; j++) {
+        for( int j=0; j< this.instance.numberOfDays; j++) {
             LinkedList<Integer> availableStaffForDay = new LinkedList<>();
-            for(int i=0;i< Main.numberOfStaff;i++) {
-                if(Main.staff.get(i).daysOff.contains(j)) { continue ; }
+            for(int i=0;i< this.instance.numberOfStaff;i++) {
+                if(this.instance.staff.get(i).daysOff.contains(j)) { continue ; }
                 availableStaffForDay.add(i);
             }
             this.availableStaffForEachDay.add(availableStaffForDay);
@@ -62,8 +67,8 @@ public class Algorithm {
     
     public void getAvailableStaffForEachDayShift() {
         
-        for(int i=0 ; i< Main.numberOfDays; i++) {
-            for (int j=0;j< Main.numberOfShiftsPerDay;j++){
+        for(int i=0 ; i< this.instance.numberOfDays; i++) {
+            for (int j=0;j< this.instance.numberOfShiftsPerDay;j++){
                 LinkedList<Integer> common = new LinkedList<>(this.availableStaffForEachDay.get(i));
                 common.retainAll(this.availableStaffForEachShift.get(j));
                 this.availableStaffForEachDayShift.add(common);
@@ -76,7 +81,7 @@ public class Algorithm {
            
             this.dayShiftFlexibility.add(
                     this.availableStaffForEachDayShift.get(i).size() - 
-                    Main.request.shiftCover.get(i)
+                    this.instance.request.shiftCover.get(i)
             );
         } 
     }

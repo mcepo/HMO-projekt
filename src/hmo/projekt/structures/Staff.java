@@ -1,6 +1,6 @@
 package hmo.projekt.structures;
 
-import hmo.projekt.Main;
+import hmo.projekt.Instance;
 import java.util.LinkedList;
 
 /**
@@ -35,7 +35,7 @@ public class Staff {
         this.id = piece[0];
        
 // mapping       
-        Main.map.staff.put(piece[0], Main.staff.size());
+        Instance.map.staff.put(piece[0], Instance.staff.size());
         
         this.maxShifts = new LinkedList<>();
         

@@ -1,6 +1,6 @@
 package hmo.projekt.structures;
 
-import hmo.projekt.Main;
+import hmo.projekt.Instance;
 import java.util.LinkedList;
 
 /**
@@ -30,13 +30,13 @@ public class Requests {
     public int weightForUnderCover;
     public int weightForOverCover;
 
-    public Requests () {
+    public Requests ( int numberOfStaff ) {
         this.weightForOverCover = 0;
         this.weightForUnderCover = 0;
         this.shiftCover = new LinkedList<>();
         this.staffOnShift = new LinkedList<>();
         
-        for (int i = 0; i < Main.numberOfStaff;i++){
+        for (int i = 0; i < numberOfStaff;i++){
             LinkedList<Integer> column = new LinkedList<>();
             this.staffOnShift.add(column);
         }
@@ -58,11 +58,11 @@ public class Requests {
 
         String[] piece = line.split(",");
         
-        int staffId = Main.map.staff.get(piece[0]);
+        int staffId = Instance.map.staff.get(piece[0]);
         int day = Integer.parseInt(piece[1]);
-        int shift = Main.map.shift.get(piece[2]);
+        int shift = Instance.map.shift.get(piece[2]);
         int weight = Integer.parseInt(piece[3]);
-        int dayShift = day * Main.numberOfShiftsPerDay + shift ;
+        int dayShift = day * Instance.numberOfShiftsPerDay + shift ;
 
         for (int i=this.staffOnShift.get(staffId).size(); i< dayShift;i++){
             this.staffOnShift.get(staffId).add(0);

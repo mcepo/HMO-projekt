@@ -1,6 +1,6 @@
 package hmo.projekt.structures;
 
-import hmo.projekt.Main;
+import hmo.projekt.Instance;
 import java.util.LinkedList;
 
 /**
@@ -23,7 +23,7 @@ public class Shift {
         this.id = piece[0];
         
 // mapping
-        Main.map.shift.put(piece[0], Main.shift.size());
+        Instance.map.shift.put(piece[0], Instance.shift.size());
         this.lengthMinutes = Integer.parseInt(piece[1]);
        
         if(piece.length > 2 && piece[2] != null) {
@@ -35,8 +35,8 @@ public class Shift {
 Spremam redni broj smjene u listi, jer mislim da će mi tako poslije biti jednostavnije
 za raditi
 */
-		for (int j = 0; j < Main.shift.size(); j++) {
-                    if(Main.shift.get(j).id.equals(shiftCantFollow[i])){
+		for (int j = 0; j < Instance.shift.size(); j++) {
+                    if(Instance.shift.get(j).id.equals(shiftCantFollow[i])){
                         this.cantFollowShift.add(j);
                         break;
                     }

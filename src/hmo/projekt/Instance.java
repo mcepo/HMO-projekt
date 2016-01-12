@@ -1,5 +1,6 @@
 package hmo.projekt;
 
+import hmo.projekt.structures.Map;
 import hmo.projekt.structures.Shift;
 import hmo.projekt.structures.Staff;
 import hmo.projekt.structures.Requests;
@@ -7,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,6 +22,22 @@ import java.util.logging.Logger;
  */
 
 public class Instance {
+    
+    public static int numberOfDays;
+    public static int numberOfStaff;
+    public static int numberOfShiftsPerDay;
+// skup svih zahtjeva smjena i radnika
+    public static Requests request;
+    
+// popis svih radnika sa podacima specifičnim za svakog radnika
+    public static LinkedList<Staff> staff = new LinkedList<>();
+    
+// popis svih smjena sa podacima specifičnim za svaku smjenu
+    public static LinkedList<Shift> shift = new LinkedList<>();
+    
+// mapiranje radnika i smjena u njihovim listama singleShift i singleStaff
+// instancira se tek nakon što znamo ukupan broj ljudi i smjena
+    public static Map map = new Map();
     
     enum DataType{
         SECTION_HORIZON, SECTION_SHIFTS, SECTION_STAFF,
@@ -69,7 +87,7 @@ public class Instance {
 // prethodno učitani npr. ukupan broj ljudi
 // NPOMENA: pretpostavljam da SECTION_SHIFT_ON_REQUESTS uvijek ide prije 
 // nego SECTION_SHIFT_OFF_REQUESTS
-                        Main.request = new Requests();
+                        this.request = new Requests(this.numberOfStaff);
                         this.readSectionShiftOnRequest();
                     break;
                     case SECTION_SHIFT_OFF_REQUESTS :
@@ -90,7 +108,7 @@ public class Instance {
             
             if(line.substring(0, 1).equals("#")) { continue; }
             
-            Main.numberOfDays = Integer.parseInt(line);
+            numberOfDays = Integer.parseInt(line);
         }
     }
     private void readSectionShifts() throws IOException {
@@ -99,11 +117,11 @@ public class Instance {
             
             if(line.substring(0, 1).equals("#")) { continue; }
             
-            Shift shift = new Shift(line);
+            Shift singleShift = new Shift(line);
 // DEBUG
-//            shift.toString();
-            Main.shift.add(shift);
-            Main.numberOfShiftsPerDay = Main.shift.size();
+//            singleShift.toString();
+            this.shift.add(singleShift);
+            this.numberOfShiftsPerDay = this.shift.size();
         }
     }
     private void readSectionStaff() throws IOException {
@@ -112,11 +130,11 @@ public class Instance {
             
             if(line.substring(0, 1).equals("#")) { continue; }
             
-            Staff staff = new Staff(line);
+            Staff singleStaff = new Staff(line);
 // DEBUG
-//            staff.toString();
-            Main.staff.add(staff);
-            Main.numberOfStaff = Main.staff.size();
+//            singleStaff.toString();
+            this.staff.add(singleStaff);
+            numberOfStaff = this.staff.size();
         }
     }
     
@@ -129,9 +147,9 @@ public class Instance {
             
             if(line.substring(0, 1).equals("#")) { continue; }
             
-            Main.staff.get(i).setDaysOff(line);
+            staff.get(i).setDaysOff(line);
 // DEBUG
- //           Main.staff.get(i).toString();
+ //           Main.singleStaff.get(i).toString();
             i++;
         }
     }
@@ -142,7 +160,7 @@ public class Instance {
             
             if(line.substring(0, 1).equals("#")) { continue; }
             
-            Main.request.setStaffShiftRequests(line, true);
+            request.setStaffShiftRequests(line, true);
         }
 // DEBUG
 //     Main.request.toString();
@@ -154,19 +172,19 @@ public class Instance {
             
             if(line.substring(0, 1).equals("#")) { continue; }
             
-            Main.request.setStaffShiftRequests(line, false);
+            request.setStaffShiftRequests(line, false);
         }
 // DEBUG
-     Main.request.toString();
+        request.toString();
     }
     
     private void readSectionCover() throws IOException {
         String line;
         while ((line = this.br.readLine()) != null ) {
             if(line.substring(0, 1).equals("#")) { continue; }
-            Main.request.setSectionCover(line);
+            request.setSectionCover(line);
         }
 // DEBUG
-     Main.request.toString();
+        request.toString();
     }
 }
