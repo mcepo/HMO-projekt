@@ -1,5 +1,6 @@
 package hmo.projekt.structures;
 
+import hmo.projekt.Main;
 import java.util.LinkedList;
 
 /**
@@ -14,7 +15,7 @@ public class Staff {
     public LinkedList<Integer> maxShifts;
     // maximalan broj minuta koje radnik smije odraditi
     public int maxTotalMinutes;
-    // minimalan broj minuta koje radnik smije iodraditi
+    // minimalan broj minuta koje radnik smije odraditi
     public int minTotalMinutes;
     // maksimalan broj uzastopnih smjena koje radnik smije imati
     public int maxConsecutiveShifts;
@@ -33,6 +34,9 @@ public class Staff {
         
         this.id = piece[0];
        
+// mapping       
+        Main.map.staff.put(piece[0], Main.staff.size());
+        
         this.maxShifts = new LinkedList<>();
         
         String[] workerShift = piece[1].split("[\\|=]");

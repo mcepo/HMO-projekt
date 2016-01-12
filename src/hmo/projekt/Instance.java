@@ -2,6 +2,7 @@ package hmo.projekt;
 
 import hmo.projekt.structures.Shift;
 import hmo.projekt.structures.Staff;
+import hmo.projekt.structures.Requests;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -64,10 +65,15 @@ public class Instance {
                         this.readSectionDaysOff();
                     break;
                     case SECTION_SHIFT_ON_REQUESTS :
-                    //    this.readSectionShiftOnRequest();
+// ovo inicijaliziram ovdje jer koristim neke podatke koje trebaju biti već
+// prethodno učitani npr. ukupan broj ljudi
+// NPOMENA: pretpostavljam da SECTION_SHIFT_ON_REQUESTS uvijek ide prije 
+// nego SECTION_SHIFT_OFF_REQUESTS
+                        Main.request = new Requests();
+                        this.readSectionShiftOnRequest();
                     break;
                     case SECTION_SHIFT_OFF_REQUESTS :
-                    //   this.readSectionShiftOffRequest();
+                        this.readSectionShiftOffRequest();
                     break;
                     case SECTION_COVER :
                         this.readSectionCover();
@@ -136,8 +142,10 @@ public class Instance {
             
             if(line.substring(0, 1).equals("#")) { continue; }
             
-            System.out.println(line);
+            Main.request.setStaffShiftRequests(line, true);
         }
+// DEBUG
+//     Main.request.toString();
     }
     
     private void readSectionShiftOffRequest() throws IOException {
@@ -146,17 +154,19 @@ public class Instance {
             
             if(line.substring(0, 1).equals("#")) { continue; }
             
-            System.out.println(line);
+            Main.request.setStaffShiftRequests(line, false);
         }
+// DEBUG
+     Main.request.toString();
     }
     
     private void readSectionCover() throws IOException {
         String line;
         while ((line = this.br.readLine()) != null ) {
             if(line.substring(0, 1).equals("#")) { continue; }
-            Main.schedule.setSectionCover(line);
+            Main.request.setSectionCover(line);
         }
 // DEBUG
-   //     Main.schedule.toString();
+     Main.request.toString();
     }
 }

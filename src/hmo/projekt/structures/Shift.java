@@ -21,6 +21,9 @@ public class Shift {
         String[] piece = line.split(",");
         
         this.id = piece[0];
+        
+// mapping
+        Main.map.shift.put(piece[0], Main.shift.size());
         this.lengthMinutes = Integer.parseInt(piece[1]);
        
         if(piece.length > 2 && piece[2] != null) {
