@@ -15,15 +15,8 @@ public class Main {
      */
     public static void main(String[] args) {
         
-        Instance instance1 = new Instance();
+        Instance instance1 = new Instance(Local.instanceFilePath);
         Algorithm al = new Algorithm(instance1);
-        al.getAvailableStaffForEachShift();
-        al.getAvailableStaffForEachDay();
-        al.getAvailableStaffForEachDayShift();
-        al.setDayShiftFlexibility();
-        
- //       Main.map.toString();
-        
- //       al.toString();
+
     }
 }

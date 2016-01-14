@@ -17,13 +17,13 @@ public class Shift {
     // slijediti ovu smjenu
     public LinkedList<Integer> cantFollowShift;
     
-    public Shift(String line) {
+    public Shift( String line, LinkedList<Shift> shift, Map map ) {
         String[] piece = line.split(",");
         
         this.id = piece[0];
         
 // mapping
-        Instance.map.shift.put(piece[0], Instance.shift.size());
+        map.shift.put(piece[0], shift.size());
         this.lengthMinutes = Integer.parseInt(piece[1]);
        
         if(piece.length > 2 && piece[2] != null) {
@@ -35,8 +35,8 @@ public class Shift {
 Spremam redni broj smjene u listi, jer mislim da će mi tako poslije biti jednostavnije
 za raditi
 */
-		for (int j = 0; j < Instance.shift.size(); j++) {
-                    if(Instance.shift.get(j).id.equals(shiftCantFollow[i])){
+		for (int j = 0; j < shift.size(); j++) {
+                    if(shift.get(j).id.equals(shiftCantFollow[i])){
                         this.cantFollowShift.add(j);
                         break;
                     }

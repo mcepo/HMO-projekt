@@ -1,6 +1,5 @@
 package hmo.projekt.structures;
 
-import hmo.projekt.Instance;
 import java.util.LinkedList;
 
 /**
@@ -54,15 +53,15 @@ public class Requests {
     }
 // NAPOMENA: pretpostavljam da svaki radnik u instanca.txt ima neki zahtjev
 //  u kojoj smjeni bi htjeo raditi
-    public void setStaffShiftRequests(String line, boolean advisable) {
+    public void setStaffShiftRequests(String line, boolean advisable, Map map, Integer numberOfShiftsPerDay ) {
 
         String[] piece = line.split(",");
         
-        int staffId = Instance.map.staff.get(piece[0]);
+        int staffId = map.staff.get(piece[0]);
         int day = Integer.parseInt(piece[1]);
-        int shift = Instance.map.shift.get(piece[2]);
+        int shift = map.shift.get(piece[2]);
         int weight = Integer.parseInt(piece[3]);
-        int dayShift = day * Instance.numberOfShiftsPerDay + shift ;
+        int dayShift = day * numberOfShiftsPerDay + shift ;
 
         for (int i=this.staffOnShift.get(staffId).size(); i< dayShift;i++){
             this.staffOnShift.get(staffId).add(0);

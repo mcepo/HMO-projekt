@@ -9,6 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,28 +17,50 @@ import java.util.logging.Logger;
  *
  * @author Marko
  * 
- * Metode za čitanje instance.txt
- * te postavljanje pročitanih vrijednosti u zadane strukture
+ * - Predstavlja instance.txt datoteku u programu
+ * 
+ * - Te sadrži sve potrebne strukture za algoritam koje je moguće inicijalno
+ * definirati
+ * 
  * 
  */
 
 public class Instance {
     
-    public static int numberOfDays;
-    public static int numberOfStaff;
-    public static int numberOfShiftsPerDay;
+    public int numberOfDays;
+    public int numberOfStaff;
+    public int numberOfShiftsPerDay;
 // skup svih zahtjeva smjena i radnika
-    public static Requests request;
+    public Requests request;
     
 // popis svih radnika sa podacima specifičnim za svakog radnika
-    public static LinkedList<Staff> staff = new LinkedList<>();
+    public LinkedList<Staff> staff = new LinkedList<>();
     
 // popis svih smjena sa podacima specifičnim za svaku smjenu
-    public static LinkedList<Shift> shift = new LinkedList<>();
+    public LinkedList<Shift> shift = new LinkedList<>();
     
 // mapiranje radnika i smjena u njihovim listama singleShift i singleStaff
 // instancira se tek nakon što znamo ukupan broj ljudi i smjena
-    public static Map map = new Map();
+    public Map map = new Map();
+    
+// koji su sve ljudi raspoloživi u pojedinoj smjeni, neovisno o danu
+// jer prema zahtjevima zadatka ne mogu svi ljudi raditi u svim smjenama
+    public LinkedList<LinkedList<Integer>> availableStaffForEachShift;
+    
+// koji su ljudi raspoloživi u pojedinom danu, neovisno o smjeni
+    public LinkedList<LinkedList<Integer>> availableStaffForEachDay;
+    
+// koji su ljudi raspoloživi u pojedinoj smjeni u pojedinom danu
+// ovaj podataka je dobiven na temelju dozvoljenih smjena iz polja MaxShifts
+// i polja SECTION_DAYS_OFF
+    public LinkedList<LinkedList<Integer>> availableStaffForEachDayShift;
+    
+// određena je "fleksibilnost" kod biranja ljudi za pojedinu smjenu
+// definira se kao broj ljudi koji ostaje raspoloživ za tu smjenu nakon što se
+// odabere potreban broj ljudi
+// to je kriterij za odabir koji za koje će se smjene prvo definirati ljudi
+// za one smjene s najmanjom fleksibilnosti se prvo bitaju ljudi
+    public List<Integer> dayShiftFlexibility;
     
     enum DataType{
         SECTION_HORIZON, SECTION_SHIFTS, SECTION_STAFF,
@@ -47,10 +70,15 @@ public class Instance {
     
     private BufferedReader br;
     
-    public Instance() {
+    public Instance(String filePath) {
+        
+        this.availableStaffForEachShift = new LinkedList<>();
+        this.availableStaffForEachDay = new LinkedList<>();
+        this.availableStaffForEachDayShift = new LinkedList<>();
+        this.dayShiftFlexibility = new LinkedList<>();
         
         try {
-            this.br = new BufferedReader(new FileReader(Local.instanceFilePath));
+            this.br = new BufferedReader(new FileReader(filePath));
             this.read();
             this.br.close();
         } catch (FileNotFoundException ex) {
@@ -58,6 +86,11 @@ public class Instance {
         } catch (IOException ex) {
             Logger.getLogger(Instance.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        this.getAvailableStaffForEachShift();
+        this.getAvailableStaffForEachDay();
+        this.getAvailableStaffForEachDayShift();
+        this.setDayShiftFlexibility();
     }
 
     public void read () throws IOException {
@@ -107,8 +140,7 @@ public class Instance {
         while ((line = this.br.readLine()).length() != 0 ) {
             
             if(line.substring(0, 1).equals("#")) { continue; }
-            
-            numberOfDays = Integer.parseInt(line);
+            this.numberOfDays = Integer.parseInt(line);
         }
     }
     private void readSectionShifts() throws IOException {
@@ -116,10 +148,8 @@ public class Instance {
         while ((line = this.br.readLine()).length() != 0 ) {
             
             if(line.substring(0, 1).equals("#")) { continue; }
-            
-            Shift singleShift = new Shift(line);
-// DEBUG
-//            singleShift.toString();
+            Shift singleShift = new Shift(line, this.shift, this.map);
+
             this.shift.add(singleShift);
             this.numberOfShiftsPerDay = this.shift.size();
         }
@@ -129,10 +159,9 @@ public class Instance {
         while ((line = this.br.readLine()).length() != 0 ) {
             
             if(line.substring(0, 1).equals("#")) { continue; }
-            
-            Staff singleStaff = new Staff(line);
+            Staff singleStaff = new Staff(line, this.map, this.staff);
 // DEBUG
-//            singleStaff.toString();
+//           singleStaff.toString();
             this.staff.add(singleStaff);
             numberOfStaff = this.staff.size();
         }
@@ -146,7 +175,6 @@ public class Instance {
         while ((line = this.br.readLine()).length() != 0 ) {
             
             if(line.substring(0, 1).equals("#")) { continue; }
-            
             staff.get(i).setDaysOff(line);
 // DEBUG
  //           Main.singleStaff.get(i).toString();
@@ -159,8 +187,7 @@ public class Instance {
         while ((line = this.br.readLine()).length() != 0 ) {
             
             if(line.substring(0, 1).equals("#")) { continue; }
-            
-            request.setStaffShiftRequests(line, true);
+            request.setStaffShiftRequests(line, true, this.map, this.numberOfShiftsPerDay );
         }
 // DEBUG
 //     Main.request.toString();
@@ -171,11 +198,10 @@ public class Instance {
         while ((line = this.br.readLine()).length() != 0 ) {
             
             if(line.substring(0, 1).equals("#")) { continue; }
-            
-            request.setStaffShiftRequests(line, false);
+            request.setStaffShiftRequests(line, false, this.map, this.numberOfShiftsPerDay );
         }
 // DEBUG
-        request.toString();
+     //   request.toString();
     }
     
     private void readSectionCover() throws IOException {
@@ -185,6 +211,51 @@ public class Instance {
             request.setSectionCover(line);
         }
 // DEBUG
-        request.toString();
+     //   request.toString();
+    }
+    
+    public void getAvailableStaffForEachShift () {
+        
+        for( int j=0; j< this.numberOfShiftsPerDay; j++) {
+            LinkedList<Integer> availableStaffForShift = new LinkedList<>();
+            for(int i=0;i< this.numberOfStaff;i++) {
+                if(this.staff.get(i).maxShifts.get(j) == 0 ) { continue; }
+                availableStaffForShift.add(i);
+            }
+            this.availableStaffForEachShift.add(availableStaffForShift);
+        }
+    }
+    
+    public void getAvailableStaffForEachDay () {
+        
+        for( int j=0; j< this.numberOfDays; j++) {
+            LinkedList<Integer> availableStaffForDay = new LinkedList<>();
+            for(int i=0;i< this.numberOfStaff;i++) {
+                if(this.staff.get(i).daysOff.contains(j)) { continue ; }
+                availableStaffForDay.add(i);
+            }
+            this.availableStaffForEachDay.add(availableStaffForDay);
+        }
+    }
+    
+    public void getAvailableStaffForEachDayShift() {
+        
+        for(int i=0 ; i< this.numberOfDays; i++) {
+            for (int j=0;j< this.numberOfShiftsPerDay;j++){
+                LinkedList<Integer> common = new LinkedList<>(this.availableStaffForEachDay.get(i));
+                common.retainAll(this.availableStaffForEachShift.get(j));
+                this.availableStaffForEachDayShift.add(common);
+            }
+        }
+    }
+    
+    public void setDayShiftFlexibility(){
+        for(int i=0 ;i<this.availableStaffForEachDayShift.size();i++){
+           
+            this.dayShiftFlexibility.add(
+                    this.availableStaffForEachDayShift.get(i).size() - 
+                    this.request.shiftCover.get(i)
+            );
+        } 
     }
 }

@@ -1,6 +1,5 @@
 package hmo.projekt.structures;
 
-import hmo.projekt.Instance;
 import java.util.LinkedList;
 
 /**
@@ -29,13 +28,13 @@ public class Staff {
     public LinkedList<Integer> daysOff;
     // 
 
-    public Staff(String line) {
+    public Staff(String line, Map map, LinkedList<Staff> staff) {
         String[] piece = line.split(",");
         
         this.id = piece[0];
        
 // mapping       
-        Instance.map.staff.put(piece[0], Instance.staff.size());
+        map.staff.put(piece[0], staff.size());
         
         this.maxShifts = new LinkedList<>();
         
