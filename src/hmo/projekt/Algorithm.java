@@ -13,6 +13,4 @@ public class Algorithm {
         
         this.instance = instance;
     }
-    
 }
-
