@@ -10,5 +10,5 @@ package hmo.projekt;
  */
 public class Local {
     
-    public static final String instanceFilePath = "E:\\Programiranje\\NetBeansProjects\\Java\\HMO-projekt\\instanca.txt";
+    public static final String instanceFilePath = "D:\\Dropbox\\FER 5.1\\Heurističke metode optimizacija\\Projekt\\Source\\Projekt\\HMO-projekt\\instanca.txt";
 }
