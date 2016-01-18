@@ -51,13 +51,6 @@ public class Instance {
 // mapiranje radnika i smjena u njihovim listama singleShift i singleStaff
 // instancira se tek nakon što znamo ukupan broj ljudi i smjena
     public Map map = new Map();
-
-// određena je "fleksibilnost" kod biranja ljudi za pojedinu smjenu
-// definira se kao broj ljudi koji ostaje raspoloživ za tu smjenu nakon što se
-// odabere potreban broj ljudi
-// to je kriterij za odabir koji za koje će se smjene prvo definirati ljudi
-// za one smjene s najmanjom fleksibilnosti se prvo bitaju ljudi
-//    public List<Integer> dayShiftFlexibility;
     
     enum DataType{
         SECTION_HORIZON, SECTION_SHIFTS, SECTION_STAFF,
@@ -68,8 +61,6 @@ public class Instance {
     private BufferedReader br;
     
     public Instance(String filePath) {
-        
-  //      this.dayShiftFlexibility = new LinkedList<>();
         
         try {
             this.br = new BufferedReader(new FileReader(filePath));
@@ -105,10 +96,6 @@ public class Instance {
                         this.readSectionDaysOff();
                     break;
                     case SECTION_SHIFT_ON_REQUESTS :
-// ovo inicijaliziram ovdje jer koristim neke podatke koje trebaju biti već
-// prethodno učitani npr. ukupan broj ljudi
-// NPOMENA: pretpostavljam da SECTION_SHIFT_ON_REQUESTS uvijek ide prije 
-// nego SECTION_SHIFT_OFF_REQUESTS
                         this.readSectionShiftOnRequest();
                     break;
                     case SECTION_SHIFT_OFF_REQUESTS :
@@ -119,6 +106,7 @@ public class Instance {
                     break;
                 }
             } catch (IllegalArgumentException ex){
+                
             }
         }
     }
