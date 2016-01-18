@@ -84,47 +84,22 @@ public class Staff {
         for (int i=0;i< numberOfDays * numberOfShiftsPerDay; i++){
             this.canWorkEachDayShift.add(i);
         }
-        int day;
 
 // ukloni dane godišnjeg odmora
         for (int i = 1; i < pieces.length; i++ ) {
             
-            day = Integer.parseInt(pieces[i]);
-            
             for(int shift=0;shift<numberOfShiftsPerDay;shift++) {
-                this.canWorkEachDayShift.remove(day*numberOfShiftsPerDay+shift);
+                this.canWorkEachDayShift.remove(Integer.parseInt(pieces[i])*numberOfShiftsPerDay+shift);
             }
         }
         
 // ukloni smjene u kojima ne smije raditi
         for(Integer shift : this.canWorkShift.keySet()) {
-            for( day = 0; day < numberOfDays; day ++) {
+            for( int day = 0; day < numberOfDays; day ++) {
                 this.canWorkEachDayShift.remove((day*numberOfShiftsPerDay) + shift);
             }
         }
     }
-
-// postavi koje smjene radnik preferira i kolika je kazna ako ne radi toj smjeni
-    public void setShiftOnRequest(String[] pieces, Map map, int numberOfShiftsPerDay) {
-        
-        int day = Integer.parseInt(pieces[1]);
-        int shift = map.shift.get(pieces[2]);
-        int weight = Integer.parseInt(pieces[3]);
- //       System.out.println("Day " + day + " shift " + shift + " weight " + weight + " (day * numberOfShiftsPerDay + shift) " + (day * numberOfShiftsPerDay + shift));
-        this.shiftOnRequest.put((day * numberOfShiftsPerDay + shift), weight);
-        
-    }
-
-// postavi smjene koje radnik ne preferira i kolika je kazna ako radi u toj smjeni
-    public void setShiftOffRequest(String[] pieces, Map map, int numberOfShiftsPerDay) {
-        
-        int day = Integer.parseInt(pieces[1]);
-        int shift = map.shift.get(pieces[2]);
-        int weight = Integer.parseInt(pieces[3]);
-        this.shiftOffRequest.put((day * numberOfShiftsPerDay + shift), weight);
-        
-    }
-    
 
     @Override
     public String toString() {

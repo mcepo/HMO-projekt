@@ -164,7 +164,11 @@ public class Instance {
             if(line.substring(0, 1).equals("#")) { continue; }
             
             String[] pieces = line.split(",");
-            this.staff.get(this.map.staff.get(pieces[0])).setShiftOnRequest(pieces, this.map, this.numberOfShiftsPerDay);
+            
+            this.staff.get(this.map.staff.get(pieces[0])).shiftOnRequest.put(
+                        (Integer.parseInt(pieces[1]) * this.numberOfShiftsPerDay + this.map.shift.get(pieces[2])), 
+                        Integer.parseInt(pieces[3])
+            );
         }
     }
     
@@ -175,8 +179,12 @@ public class Instance {
             if(line.substring(0, 1).equals("#")) { continue; }
                         
             String[] pieces = line.split(",");
-            this.staff.get(this.map.staff.get(pieces[0])).setShiftOffRequest(pieces, this.map, this.numberOfShiftsPerDay);
             
+            this.staff.get(this.map.staff.get(pieces[0])).shiftOffRequest.put(
+                        (Integer.parseInt(pieces[1]) * this.numberOfShiftsPerDay + this.map.shift.get(pieces[2])), 
+                        Integer.parseInt(pieces[3])
+            );
+
   // DEBUG
   //          this.staff.get(this.map.staff.get(pieces[0])).toString();
         }
