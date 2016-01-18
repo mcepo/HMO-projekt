@@ -12,8 +12,8 @@ import java.util.HashMap;
  */
 public class Map {
     
-    HashMap<String, Integer> staff;
-    HashMap<String, Integer> shift;
+    public HashMap<String, Integer> staff;
+    public HashMap<String, Integer> shift;
     
     public Map(){
         this.shift = new HashMap<>();

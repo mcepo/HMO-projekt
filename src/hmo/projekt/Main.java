@@ -16,7 +16,7 @@ public class Main {
     public static void main(String[] args) {
         
         Instance instance1 = new Instance(Local.instanceFilePath);
-        Algorithm al = new Algorithm(instance1);
+        new Algorithm(instance1);
 
     }
 }

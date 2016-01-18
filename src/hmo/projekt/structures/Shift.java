@@ -1,7 +1,7 @@
 package hmo.projekt.structures;
 
-import hmo.projekt.Instance;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
@@ -15,9 +15,9 @@ public class Shift {
     public int lengthMinutes;
     // spremam index iz liste smjene na koje mjestu se nalazi smjena koja ne smije
     // slijediti ovu smjenu
-    public LinkedList<Integer> cantFollowShift;
+    public List<Integer> cantFollowShift;
     
-    public Shift( String line, LinkedList<Shift> shift, Map map ) {
+    public Shift( String line, List<Shift> shift, Map map ) {
         String[] piece = line.split(",");
         
         this.id = piece[0];
