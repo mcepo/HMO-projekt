@@ -1,6 +1,7 @@
 package hmo.projekt;
 
 import hmo.projekt.structures.instance.Map;
+import hmo.projekt.structures.instance.Request;
 import hmo.projekt.structures.instance.Shift;
 import hmo.projekt.structures.instance.Worker;
 import java.io.BufferedReader;
@@ -31,9 +32,6 @@ public class Instance {
     public int numberOfDays;
     public int numberOfWorkers;
     public int numberOfShiftsPerDay;
- 
-// ukupan broj smjena numberOfDays * numberOfShiftsPerDay
-    public int totalNumberOfShifts;
     
 // kolika je "kazna" ako ima previše ili premalo radnika u smjeni
     public int weightForShiftCoverUnder;
@@ -55,7 +53,7 @@ public class Instance {
 // instancira se tek nakon što znamo ukupan broj ljudi i smjena
     public Map map = new Map();
     
-    enum DataType{
+    private enum DataType{
         SECTION_HORIZON, SECTION_SHIFTS, SECTION_STAFF,
         SECTION_DAYS_OFF, SECTION_SHIFT_ON_REQUESTS, 
         SECTION_SHIFT_OFF_REQUESTS, SECTION_COVER;
@@ -138,7 +136,6 @@ public class Instance {
 
             this.shifts.add(singleShift);
             this.numberOfShiftsPerDay = this.shifts.size();
-            this.totalNumberOfShifts = this.numberOfDays * this.numberOfShiftsPerDay;
         }
     }
     private void readSectionStaff() throws IOException {
@@ -176,11 +173,10 @@ public class Instance {
             if(line.substring(0, 1).equals("#")) { continue; }
             
             String[] pieces = line.split(",");
-           
+            
             this.staff.get(this.map.staff.get(pieces[0])).shiftOnRequest.put(
-                        (Integer.parseInt(pieces[1]) * this.numberOfShiftsPerDay + this.map.shift.get(pieces[2])), 
-                        Integer.parseInt(pieces[3])
-            );
+                    Integer.parseInt(pieces[1]), 
+                    new Request(this.map.shift.get(pieces[2]),Integer.parseInt(pieces[3])));
         }
     }
     
@@ -193,9 +189,8 @@ public class Instance {
             String[] pieces = line.split(",");
             
             this.staff.get(this.map.staff.get(pieces[0])).shiftOffRequest.put(
-                        (Integer.parseInt(pieces[1]) * this.numberOfShiftsPerDay + this.map.shift.get(pieces[2])), 
-                        Integer.parseInt(pieces[3])
-            );
+                    Integer.parseInt(pieces[1]), 
+                    new Request(this.map.shift.get(pieces[2]),Integer.parseInt(pieces[3])));
 
   // DEBUG
    //         this.staff.get(this.map.staff.get(pieces[0])).toString();

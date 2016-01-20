@@ -37,9 +37,9 @@ public class Worker {
     public HashSet<Integer> possibleDays ;
     
 // želje radnika u kojim smjenama bi htjeli raditi i u kojima nebi htjeli raditi
-    public HashMap<Integer, Integer> shiftOnRequest;
-    public HashMap<Integer, Integer> shiftOffRequest;
-    
+//                    day     
+    public HashMap<Integer, Request> shiftOnRequest;
+    public HashMap<Integer, Request> shiftOffRequest;
     
 // ovo koristim samo kad inicijaliziram populaciju, koristi se za ravnomjerno
 // raspoređivanje radnika kroz sve dane rasporeda
@@ -49,6 +49,8 @@ public class Worker {
      
 
     public Worker(String line, Map map, List<Worker> staff, List<Shift> shifts, int numberOfShiftsPerDay) {
+        
+        
         
         this.possibleDays = new HashSet<>();
         this.shiftOnRequest = new HashMap<>();
