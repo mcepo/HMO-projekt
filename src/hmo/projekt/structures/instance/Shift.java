@@ -1,5 +1,6 @@
-package hmo.projekt.structures;
+package hmo.projekt.structures.instance;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -15,7 +16,7 @@ public class Shift {
     public int lengthMinutes;
     // spremam index iz liste smjene na koje mjestu se nalazi smjena koja ne smije
     // slijediti ovu smjenu
-    public List<Integer> cantFollowShift;
+    public HashSet<Integer> cantFollowShift;
     
     public Shift( String line, List<Shift> shift, Map map ) {
         String[] piece = line.split(",");
@@ -27,7 +28,7 @@ public class Shift {
         this.lengthMinutes = Integer.parseInt(piece[1]);
        
         if(piece.length > 2 && piece[2] != null) {
-            this.cantFollowShift = new LinkedList<>();
+            this.cantFollowShift = new HashSet<>();
             String[] shiftCantFollow = piece[2].split("\\|");
             for (int i = 0; i < shiftCantFollow.length; i++){
 /* NAPOMENA: ovdje pretpostavljaš da su smjene koju su navedene u varijabli shiftCantFollow

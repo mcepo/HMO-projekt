@@ -1,4 +1,4 @@
-package hmo.projekt.structures;
+package hmo.projekt.structures.instance;
 
 import java.util.HashMap;
 

@@ -1,13 +1,14 @@
 package hmo.projekt;
 
-import hmo.projekt.structures.Map;
-import hmo.projekt.structures.Shift;
-import hmo.projekt.structures.Staff;
+import hmo.projekt.structures.instance.Map;
+import hmo.projekt.structures.instance.Shift;
+import hmo.projekt.structures.instance.Worker;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -28,7 +29,7 @@ import java.util.logging.Logger;
 public class Instance {
     
     public int numberOfDays;
-    public int numberOfStaff;
+    public int numberOfWorkers;
     public int numberOfShiftsPerDay;
  
 // ukupan broj smjena numberOfDays * numberOfShiftsPerDay
@@ -38,15 +39,17 @@ public class Instance {
     public int weightForShiftCoverUnder;
     public int weightForShiftCoverOver;
     
-    
 // koliko je potrebno radnika u pojedinoj smjeni
     public HashMap<Integer, Integer> shiftCover;
     
 // popis svih radnika sa podacima specifičnim za svakog radnika
-    public List<Staff> staff = new LinkedList<>();
+    public List<Worker> staff ;
     
 // popis svih smjena sa podacima specifičnim za svaku smjenu
-    public List<Shift> shift = new LinkedList<>();
+    public List<Shift> shifts ;
+    
+    public HashSet<Integer> weekendShiftsSaturday;
+    public HashSet<Integer> weekendShiftsSunday;
     
 // mapiranje radnika i smjena u njihovim listama singleShift i singleStaff
 // instancira se tek nakon što znamo ukupan broj ljudi i smjena
@@ -62,6 +65,11 @@ public class Instance {
     
     public Instance(String filePath) {
         
+        this.weekendShiftsSaturday = new HashSet<>();
+        this.weekendShiftsSunday = new HashSet<>();
+        this.staff = new LinkedList<>();
+        this.shifts = new LinkedList<>(); 
+        
         try {
             this.br = new BufferedReader(new FileReader(filePath));
             this.read();
@@ -71,6 +79,8 @@ public class Instance {
         } catch (IOException ex) {
             Logger.getLogger(Instance.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        this.setWeekends();
     }
 
     public void read () throws IOException {
@@ -124,10 +134,10 @@ public class Instance {
         while ((line = this.br.readLine()).length() != 0 ) {
             
             if(line.substring(0, 1).equals("#")) { continue; }
-            Shift singleShift = new Shift(line, this.shift, this.map);
+            Shift singleShift = new Shift(line, this.shifts, this.map);
 
-            this.shift.add(singleShift);
-            this.numberOfShiftsPerDay = this.shift.size();
+            this.shifts.add(singleShift);
+            this.numberOfShiftsPerDay = this.shifts.size();
             this.totalNumberOfShifts = this.numberOfDays * this.numberOfShiftsPerDay;
         }
     }
@@ -136,11 +146,11 @@ public class Instance {
         while ((line = this.br.readLine()).length() != 0 ) {
             
             if(line.substring(0, 1).equals("#")) { continue; }
-            Staff singleStaff = new Staff(line, this.map, this.staff);
+            Worker singleStaff = new Worker(line, this.map, this.staff, this.shifts, this.numberOfShiftsPerDay);
 
             this.staff.add(singleStaff);
         }
-        this.numberOfStaff = this.staff.size();
+        this.numberOfWorkers = this.staff.size();
     }
     
     private void readSectionDaysOff() throws IOException {
@@ -152,9 +162,11 @@ public class Instance {
             
             if(line.substring(0, 1).equals("#")) { continue; }
             staff.get(i).setDaysOff(line, this.numberOfDays, this.numberOfShiftsPerDay );
-            
             i++;
+            
         }
+        
+  //      this.staff.get(44).calculateSpread();
     }
     
     private void readSectionShiftOnRequest() throws IOException {
@@ -164,7 +176,7 @@ public class Instance {
             if(line.substring(0, 1).equals("#")) { continue; }
             
             String[] pieces = line.split(",");
-            
+           
             this.staff.get(this.map.staff.get(pieces[0])).shiftOnRequest.put(
                         (Integer.parseInt(pieces[1]) * this.numberOfShiftsPerDay + this.map.shift.get(pieces[2])), 
                         Integer.parseInt(pieces[3])
@@ -186,7 +198,7 @@ public class Instance {
             );
 
   // DEBUG
-  //          this.staff.get(this.map.staff.get(pieces[0])).toString();
+   //         this.staff.get(this.map.staff.get(pieces[0])).toString();
         }
     }
     
@@ -194,11 +206,10 @@ public class Instance {
         
         String line;
         this.shiftCover = new HashMap<>();
-        
         while ((line = this.br.readLine()) != null ) {
             if(line.substring(0, 1).equals("#")) { continue; }
             String[] pieces = line.split(",");
-            
+    
             this.shiftCover.put(
                     (Integer.parseInt(pieces[0])*this.numberOfShiftsPerDay+this.map.shift.get(pieces[1])), 
                     Integer.parseInt(pieces[2]) 
@@ -210,5 +221,13 @@ public class Instance {
         }
 // DEBUG      
 //        System.out.println(this.shiftCover.toString());
+    }
+    
+    private void setWeekends () {
+
+        for(int day = 5; day < this.numberOfDays; day += 7) {
+            this.weekendShiftsSaturday.add(day);
+            this.weekendShiftsSunday.add(day+1);
+        }
     }
 }
