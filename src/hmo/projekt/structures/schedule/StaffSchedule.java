@@ -1,10 +1,8 @@
 package hmo.projekt.structures.schedule;
 
-import hmo.projekt.structures.instance.Request;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  *
@@ -18,7 +16,7 @@ public class StaffSchedule {
     public HashMap<Integer, Integer> shiftCover;
     
     public HashMap<Integer, Integer> shiftFitness;
-    public int totalFitness;
+    public Integer totalFitness;
     
     public StaffSchedule (HashMap<Integer, Integer> shiftCover){
         
