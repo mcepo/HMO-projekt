@@ -15,6 +15,7 @@ public class Algorithm {
     private final int POPULATION_SIZE = 20;
     private final float PASS_RATE = (float) 0.7;
     private final int OPTIMAL_SOLUTION  = 0;
+    private int MAX_ITERATIONS = 50;
     
     private final Instance instance;
     public PopulationGenerator generator;
@@ -70,6 +71,7 @@ public class Algorithm {
     private boolean isSatisfying(List<StaffSchedule> population) {
         int best = this.population.get(0).totalFitness;
         System.out.println("Current best result: "+ best);
-        return best <= OPTIMAL_SOLUTION;
+        -- MAX_ITERATIONS;
+        return (best <= OPTIMAL_SOLUTION || MAX_ITERATIONS == 0 ) ;
     }
 }
