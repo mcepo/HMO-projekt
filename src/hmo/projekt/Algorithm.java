@@ -31,7 +31,7 @@ public class Algorithm {
         this.generator = new PopulationGenerator(this.instance);
         this.crossover = new Crossover();
         
-        System.out.println("Generiram inicijalnu populaciju");
+        System.out.println("Generiram inicijalnu populaciju (3 - 5 min)");
         
         int bestFitness = 1000000;
         do {
