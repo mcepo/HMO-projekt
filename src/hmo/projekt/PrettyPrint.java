@@ -18,9 +18,9 @@ public class PrettyPrint {
         
         for(WorkerSchedule workerSchedule : schedule.workerSchedules) {
             
-            for(int day=0; day < instance.numberOfDays; day++ ) {
-                if (workerSchedule.schedule.containsKey(day)){
-                    System.out.print(instance.shifts.get(workerSchedule.schedule.get(day)).id + "\t");
+            for(int day=0; day < workerSchedule.schedule.length; day++ ) {
+                if (workerSchedule.schedule[day] != -1){
+                    System.out.print(instance.shifts.get(workerSchedule.schedule[day]).id + "\t");
                 } else {
                     System.out.print("  \t");
                 }
@@ -36,9 +36,9 @@ public class PrettyPrint {
             writer = new PrintWriter("result.txt", "UTF-8");
             for(WorkerSchedule workerSchedule : schedule.workerSchedules) {
             
-            for(int day=0; day < instance.numberOfDays; day++ ) {
-                if (workerSchedule.schedule.containsKey(day)){
-                    writer.print(instance.shifts.get(workerSchedule.schedule.get(day)).id + "\t");
+            for(int day=0; day < workerSchedule.schedule.length; day++ ) {
+                if (workerSchedule.schedule[day] != -1){
+                    writer.print(instance.shifts.get(workerSchedule.schedule[day]).id + "\t");
                 } else {
                     writer.print("  \t");
                 }
@@ -49,6 +49,26 @@ public class PrettyPrint {
         
         } catch (FileNotFoundException | UnsupportedEncodingException ex) {
             Logger.getLogger(PrettyPrint.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public static void workerSchedule(int[] schedule, Instance instance){
+        
+         
+        for(int day = 0; day < schedule.length;day ++) {
+            if (schedule[day] != -1) {
+                System.out.print(day + " " + schedule[day]);
+            } else {
+                System.out.print(day + " Ne radim!");
+            }
+            
+            if(instance.weekendShiftsSaturday.contains(day)) {
+                System.out.println( "\t\tSubota");
+            } else if (instance.weekendShiftsSunday.contains(day)) {
+                System.out.println( "\t\tNedjelja");
+            } else {
+                System.out.println();
+            }
         }
     }
 }

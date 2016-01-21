@@ -22,9 +22,7 @@ public class Crossover {
 
     private void merge(List<WorkerSchedule> workerSchedule, List<WorkerSchedule> result, int start, int end) {
         for( int i = start; i < end; i++){
-            WorkerSchedule copyWorkerSchedule = new WorkerSchedule(   workerSchedule.get(i).schedule, 
-                                                                            workerSchedule.get(i).workerId,
-                                                                            workerSchedule.get(i).maxWeekends);
+            WorkerSchedule copyWorkerSchedule = new WorkerSchedule( workerSchedule.get(i) );
             result.add(copyWorkerSchedule);
         }
     }

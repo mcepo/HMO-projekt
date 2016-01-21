@@ -62,6 +62,7 @@ public class Algorithm {
             }
             Collections.sort(population);
             population = population.subList(0, this.POPULATION_SIZE);
+            PrettyPrint.scheduleToFile(population.get(0), instance);
         }
     //    PrettyPrint.scheduleToStdout(this.population.get(0), this.instance);
     }

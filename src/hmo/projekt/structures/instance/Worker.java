@@ -116,9 +116,7 @@ public class Worker {
         
         for (int consecutiveShifts = this.minConsecutiveShifts; consecutiveShifts <= this.maxConsecutiveShifts; consecutiveShifts ++) {
             n = (int) this.maxShifts / consecutiveShifts;
-            if ((n*this.minConsecutiveDaysOff) > minDaysOff) {
-                ++ this.minConsecutiveShifts;
-            } else {
+            if ((n*this.minConsecutiveDaysOff) <= minDaysOff) {
                 this.spreadDaysOn.add (consecutiveShifts);
                 this.spreadDaysOff.add((int) maxDaysOff/n);
             }

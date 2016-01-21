@@ -1,7 +1,6 @@
 package hmo.projekt.structures.schedule;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,15 +13,12 @@ public class StaffSchedule  implements Comparable<StaffSchedule>{
     public List<WorkerSchedule> workerSchedules;
  
     int[][] shiftCover;
-    
-    public HashMap<Integer, Integer> shiftFitness;
     public Integer totalFitness;
     
     public StaffSchedule ( int[][] shiftCover){
         
         this.totalFitness = 0;
         this.workerSchedules = new ArrayList<>();
-        this.shiftFitness = new HashMap<>();
         
         this.shiftCover = new int[shiftCover.length][];
         for(int i = 0; i < shiftCover.length; i++)
@@ -55,9 +51,11 @@ public class StaffSchedule  implements Comparable<StaffSchedule>{
     public void calculateShiftCover() {
         
         for(WorkerSchedule workerSchedule : this.workerSchedules) {
-            for (Map.Entry<Integer, Integer> workShift : workerSchedule.schedule.entrySet()) {
+            for(int day = 0; day < workerSchedule.schedule.length; day ++) {
                 
-                -- this.shiftCover[workShift.getKey()][workShift.getValue()];
+                if(workerSchedule.schedule[day] != -1) {
+                    -- this.shiftCover[day][workerSchedule.schedule[day]];
+                }
             }
         }
     }
@@ -74,7 +72,6 @@ public class StaffSchedule  implements Comparable<StaffSchedule>{
         System.out.println(
          "StaffSchedule{" +
                  "\n shiftCover= " + shiftCover + 
-                 "\n shiftFitness= " + shiftFitness + 
                  "\n totalFitness= " + totalFitness + 
                  '}'
         );

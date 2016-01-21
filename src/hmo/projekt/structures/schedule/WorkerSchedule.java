@@ -13,19 +13,33 @@ import java.util.Map;
 public class WorkerSchedule {
     
     public int workerId;
-    public HashMap<Integer, Integer> schedule;
+    public int[] schedule;
     public int fitness;
     
 // pretpostavljam da će mi trebati kod zamjena dana
     public int maxWeekends;
     
+    public int daysToMaxDay;
+    public int daysToMinDay;
+    
     public int leftoverWorkDays ;
 
-    public WorkerSchedule(HashMap<Integer, Integer> schedule, int workerId, int maxWeekends) {
+    public WorkerSchedule(int[] schedule, int workerId, int maxWeekends, int daysToMaxDay, int daysToMinDay) {
         
         this.schedule = schedule;
         this.workerId = workerId;
         this.maxWeekends = maxWeekends;
+        this.daysToMinDay = daysToMinDay;
+        this.daysToMaxDay = daysToMaxDay;
+    }
+
+    public WorkerSchedule(WorkerSchedule workerSchedule) {
+        
+        this.schedule = workerSchedule.schedule;
+        this.workerId = workerSchedule.workerId;
+        this.maxWeekends = workerSchedule.maxWeekends;
+        this.daysToMinDay = workerSchedule.daysToMinDay;
+        this.daysToMaxDay = workerSchedule.daysToMaxDay;
     }
    
 // izračunava fitness za razmještaj tog korisnika
@@ -38,18 +52,17 @@ public class WorkerSchedule {
             Integer day = shiftOnRequest.getKey();
             Request request = shiftOnRequest.getValue();
             
-            if (     this.schedule.containsKey(day) == false 
-                || ( this.schedule.containsKey(day) == true && this.schedule.get(day) != request.shift ) ) {
+            if (     this.schedule[day] == -1 
+                || ( this.schedule[day] != -1 && this.schedule[day] != request.shift ) ) {
                 this.fitness += request.weight;
             }
-            
         }
         
         for (Map.Entry<Integer, Request> shiftOffRequest : worker.shiftOffRequest.entrySet()) {
             Integer day = shiftOffRequest.getKey();
             Request request = shiftOffRequest.getValue();
             
-            if ( (this.schedule.containsKey(day) == true) && (this.schedule.get(day) == request.shift ) ) {
+            if ( (this.schedule[day] != -1) && (this.schedule[day] == request.shift ) ) {
                 this.fitness += request.weight;
             }
         }
@@ -58,8 +71,8 @@ public class WorkerSchedule {
     public void debug (Instance instance) {
         
         for(int day = 0; day < instance.numberOfDays;day ++) {
-            if (schedule.containsKey(day)) {
-                System.out.print(day + " " + schedule.get(day));
+            if (schedule[day] != -1) {
+                System.out.print(day + " " + schedule[day]);
             } else {
                 System.out.print(day + " Ne radim!");
             }
