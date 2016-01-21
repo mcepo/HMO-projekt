@@ -12,7 +12,7 @@ import java.util.List;
 
 public class Algorithm {
     
-    private final int POPULATION_SIZE = 50;
+    private final int POPULATION_SIZE = 20;
     private final float PASS_RATE = (float) 0.7;
     private final int OPTIMAL_SOLUTION  = 0;
     

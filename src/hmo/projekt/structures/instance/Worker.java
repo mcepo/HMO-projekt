@@ -1,6 +1,5 @@
 package hmo.projekt.structures.instance;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,7 +15,7 @@ public class Worker {
     // identifikator radnika
     public String id;
     // smjene koje smije raditi
-    public List<Integer> canWorkShift;
+    public HashSet<Integer> canWorkShift;
     // maximalan broj minuta koje radnik smije odraditi
     public int maxTotalMinutes;
     // minimalan broj minuta koje radnik smije odraditi
@@ -61,7 +60,7 @@ public class Worker {
 // mapping       
         staffMap.put(piece[0], staff.size());
         
-        this.canWorkShift = new ArrayList<>();
+        this.canWorkShift = new HashSet<>();
         
         String[] workerShift = piece[1].split("[\\|=]");
         int shiftValue;

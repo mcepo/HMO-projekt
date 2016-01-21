@@ -4,6 +4,7 @@ import hmo.projekt.structures.instance.Worker;
 import hmo.projekt.structures.schedule.StaffSchedule;
 import hmo.projekt.structures.schedule.WorkerSchedule;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -34,7 +35,16 @@ public class PopulationGenerator {
         }
         
         this.staffSchedule.calculateFitness(this.instance.weightForShiftCoverUnder, this.instance.weightForShiftCoverOver);
-
+      
+  //      System.out.println(this.staffSchedule.totalFitness);
+        
+//        for(WorkerSchedule ws : this.staffSchedule.workerSchedules){
+//            System.out.println("\n******* ID " + ws.workerId + " ************************************* ");
+//            ws.debug(instance);
+//        }
+        this.correctionsInSingleDay();
+  //      System.out.println(this.staffSchedule.totalFitness);
+        
         return staffSchedule;
     }
     
@@ -62,6 +72,12 @@ public class PopulationGenerator {
 
             if (worker.possibleDays.contains(day) == false ) { 
                 ++ day;
+                
+                if (schedule[day -1] != -1 && schedule[day -2] == -1){
+                    schedule[day -1 ] = -1;
+                }
+                
+                consecutiveDaysOn = 0;
                 continue;
             }
 
@@ -89,7 +105,8 @@ public class PopulationGenerator {
             schedule[day] = allowedShiftsInNextDay.get(shift);
             workDays ++;
 
-            if ( this.instance.weekendShiftsSaturday.contains(day)) {
+            if ( this.instance.weekendShiftsSaturday.contains(day) || 
+                 ( this.instance.weekendShiftsSunday.contains(day) &&  schedule[day-1] == -1)) {
                 if (maxWeekends == 0) {
                     return null ;
                 } else {
@@ -117,22 +134,19 @@ public class PopulationGenerator {
             ++ day;
         }
         
-        int consecutiveWorkDays = 0;
+        consecutiveDaysOn = 0;
         
         for(day = initDay;day < schedule.length;day ++) {
             
             if (schedule[day] == -1 ) {
-                if( consecutiveWorkDays < worker.minConsecutiveShifts && consecutiveWorkDays != 0) {
+                if( consecutiveDaysOn < worker.minConsecutiveShifts && consecutiveDaysOn != 0) {
                     schedule[day -1 ] = -1 ;
                 }
-                consecutiveWorkDays = 0;
+                consecutiveDaysOn = 0;
             } else {
-                consecutiveWorkDays ++;
+                consecutiveDaysOn ++;
             }
-        }  
-                            if (schedule[day - 1] == -1 && schedule [ day - 2 ] != -1 && schedule [day - 3] == -1 ){
-                schedule[day - 2 ] = -1;
-            }
+        }
         
 //        System.out.println(
 //                worker.id + 
@@ -158,5 +172,68 @@ public class PopulationGenerator {
         } else {
             return null;
         }
+    }
+
+    private void correctionsInSingleDay() { 
+        
+        for(WorkerSchedule workerSchedule : this.staffSchedule.workerSchedules){
+            
+         //   workerSchedule.debug(instance);
+            
+       //     System.out.println("\n******************** worker " + workerSchedule.workerId + " **************");
+            
+            HashSet <Integer> canWorkShift = this.instance.staff.get(workerSchedule.workerId).canWorkShift;
+            int[][] shiftCover = this.staffSchedule.shiftCover;
+            
+            for(int day = 0; day < workerSchedule.schedule.length; day ++ ) {
+                
+                if (workerSchedule.schedule[day] == -1 ) { continue; }
+                
+                if (shiftCover[day][workerSchedule.schedule[day]] < 0) {
+// imam previše ljudi u toj smjeni
+       //             System.out.println(day + " -> Prošao (ima previše ljudi u smjeni) " + this.staffSchedule.shiftCover[day][workerSchedule.schedule[day]] + " smjena " + workerSchedule.schedule[day]);
+                    
+                    for(Integer shift : canWorkShift) {
+                        if (shiftCover[day][shift] > 0) {
+// ima smjena u koju mogu dodati
+                     // ako je nova smjena manja od trenutne smjene
+                            int tempDay = 0;
+                            if ( workerSchedule.schedule[day] > shift){
+// moraš unazad provjeriti jel sve valja
+            //                 System.out.println("Smjena " + shift + " fali ljudi, ima mjesta: " + shiftCover[day][shift]);
+                                for(tempDay = day; (tempDay >= 0 &&  workerSchedule.schedule[tempDay] != -1) ; --tempDay ) {
+                                    
+                                    if ( workerSchedule.schedule[tempDay] > shift ){
+                                                                                
+                                        ++ shiftCover[tempDay][workerSchedule.schedule[tempDay]];
+                                        workerSchedule.schedule[tempDay] = shift;
+                                        -- shiftCover[tempDay][workerSchedule.schedule[tempDay]];
+                                                                                
+                                    }else {
+                                        break;
+                                    }
+                                }
+                            } else {
+//  moraš unaprijed provjeriti jel sve valja
+             //               System.out.println("Smjena " + shift + " fali ljudi, ima mjesta: " + shiftCover[day][shift]);
+                                for(tempDay = day; tempDay < workerSchedule.schedule.length && workerSchedule.schedule[tempDay] != -1 ;tempDay ++) {
+                                    if ( workerSchedule.schedule[tempDay] < shift ){
+                                        
+                                        ++ shiftCover[tempDay][workerSchedule.schedule[tempDay]];
+                                        workerSchedule.schedule[tempDay] = shift;
+                                        -- shiftCover[tempDay][workerSchedule.schedule[tempDay]];
+                                        
+                                    }else {
+                                        break;
+                                    }
+                                }
+                            }
+                            break;
+                        }
+                    }   
+                }
+            }
+        }
+        this.staffSchedule.calculateFitnessWithCover(this.instance.weightForShiftCoverUnder, this.instance.weightForShiftCoverOver);
     }
 }

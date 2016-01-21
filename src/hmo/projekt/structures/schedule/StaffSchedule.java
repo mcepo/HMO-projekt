@@ -2,7 +2,6 @@ package hmo.projekt.structures.schedule;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  *
@@ -12,7 +11,7 @@ public class StaffSchedule  implements Comparable<StaffSchedule>{
     
     public List<WorkerSchedule> workerSchedules;
  
-    int[][] shiftCover;
+    public int[][] shiftCover;
     public Integer totalFitness;
     
     public StaffSchedule ( int[][] shiftCover){
@@ -32,6 +31,27 @@ public class StaffSchedule  implements Comparable<StaffSchedule>{
     public void calculateFitness( int weightForShiftCoverUnder, int weightForShiftCoverOver) {
         
         this.calculateShiftCover();
+
+        
+        for (int day = 0; day < this.shiftCover.length; day ++) {
+            for(int shift=0;shift < this.shiftCover[day].length; shift ++){
+    // imam previše ljudi u smjeni
+                if (this.shiftCover[day][shift] < 0) {
+                    totalFitness += Math.abs(this.shiftCover[day][shift]) * weightForShiftCoverOver;
+    // imam premalo ljudi u smjeni
+                } else {
+                    this.totalFitness += this.shiftCover[day][shift] * weightForShiftCoverUnder;
+                }
+            }
+        }
+        
+        this.addWorkerFitness();
+    }
+    
+    // iznačunava fitness za svaku smjenu posebno i ukupni fitness
+    public void calculateFitnessWithCover( int weightForShiftCoverUnder, int weightForShiftCoverOver) {
+
+        this.totalFitness = 0;
         
         for (int day = 0; day < this.shiftCover.length; day ++) {
             for(int shift=0;shift < this.shiftCover[day].length; shift ++){
