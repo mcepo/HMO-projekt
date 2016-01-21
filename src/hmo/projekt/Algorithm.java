@@ -12,11 +12,14 @@ import java.util.List;
 
 public class Algorithm {
     
-    private final int INIT_POPULATION = 50;
-    private final float PASS_RATE = (int) 0.6;
+    private final int POPULATION_SIZE = 50;
+    private final float PASS_RATE = (float) 0.7;
+    private final int OPTIMAL_SOLUTION  = 0;
     
     private final Instance instance;
     public PopulationGenerator generator;
+    
+    public Crossover crossover;
     
     public List<StaffSchedule> population ;
     
@@ -25,6 +28,7 @@ public class Algorithm {
         this.population = new LinkedList<>();
         this.instance = instance;
         this.generator = new PopulationGenerator(this.instance);
+        this.crossover = new Crossover();
         
         System.out.println("Generiram inicijalnu populaciju");
         
@@ -35,15 +39,36 @@ public class Algorithm {
                 bestFitness = this.population.get(0).totalFitness;
             }
             
-            for(int i = this.population.size(); i< this.INIT_POPULATION;i++){
+            for(int i = this.population.size(); i< this.POPULATION_SIZE;i++){
 
                 this.population.add(this.generator.generateStaffSchedule());
 
             }
-            this.population.subList((int)(this.population.size() * this.PASS_RATE), this.population.size() -1 );
-            Collections.sort(this.population, new CustomComparator());
+            this.population = this.population.subList(0 ,this.POPULATION_SIZE );
+            Collections.sort(this.population);
         } while (bestFitness > this.population.get(0).totalFitness);
-        System.out.println("Best fitness " + bestFitness);
-        PrettyPrint.scheduleToFile(this.population.get(0), this.instance);
+        
+        this.start();
+    }
+    
+    public void start () {
+        
+        while (!this.isSatisfying(population)){
+            for(int i = 0; i < this.POPULATION_SIZE -1 ; i++){
+                StaffSchedule offspring = crossover.apply(population.get(i), population.get(i + 1),  this.instance.shiftCover);
+             //   offspring = mutate.apply(offspring);
+                offspring.calculateFitness(this.instance.weightForShiftCoverUnder, this.instance.weightForShiftCoverOver);
+                population.add(offspring);
+            }
+            Collections.sort(population);
+            population = population.subList(0, this.POPULATION_SIZE);
+        }
+    //    PrettyPrint.scheduleToStdout(this.population.get(0), this.instance);
+    }
+    
+    private boolean isSatisfying(List<StaffSchedule> population) {
+        int best = this.population.get(0).totalFitness;
+        System.out.println("Current best result: "+ best);
+        return best <= OPTIMAL_SOLUTION;
     }
 }

@@ -48,9 +48,7 @@ public class Worker {
     
      
 
-    public Worker(String line, Map map, List<Worker> staff, List<Shift> shifts, int numberOfShiftsPerDay) {
-        
-        
+    public Worker(String line, HashMap<String, Integer> staffMap, List<Worker> staff, List<Shift> shifts, int numberOfShiftsPerDay) {
         
         this.possibleDays = new HashSet<>();
         this.shiftOnRequest = new HashMap<>();
@@ -61,7 +59,7 @@ public class Worker {
         this.id = piece[0];
        
 // mapping       
-        map.staff.put(piece[0], staff.size());
+        staffMap.put(piece[0], staff.size());
         
         this.canWorkShift = new ArrayList<>();
         

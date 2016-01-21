@@ -1,5 +1,6 @@
 package hmo.projekt.structures.schedule;
 
+import hmo.projekt.Instance;
 import hmo.projekt.structures.instance.Request;
 import hmo.projekt.structures.instance.Worker;
 import java.util.HashMap;
@@ -17,6 +18,8 @@ public class WorkerSchedule {
     
 // pretpostavljam da će mi trebati kod zamjena dana
     public int maxWeekends;
+    
+    public int leftoverWorkDays ;
 
     public WorkerSchedule(HashMap<Integer, Integer> schedule, int workerId, int maxWeekends) {
         
@@ -48,6 +51,25 @@ public class WorkerSchedule {
             
             if ( (this.schedule.containsKey(day) == true) && (this.schedule.get(day) == request.shift ) ) {
                 this.fitness += request.weight;
+            }
+        }
+    }
+    
+    public void debug (Instance instance) {
+        
+        for(int day = 0; day < instance.numberOfDays;day ++) {
+            if (schedule.containsKey(day)) {
+                System.out.print(day + " " + schedule.get(day));
+            } else {
+                System.out.print(day + " Ne radim!");
+            }
+            
+            if(instance.weekendShiftsSaturday.contains(day)) {
+                System.out.println( "\t\tSubota");
+            } else if (instance.weekendShiftsSunday.contains(day)) {
+                System.out.println( "\t\tNedjelja");
+            } else {
+                System.out.println();
             }
         }
     }

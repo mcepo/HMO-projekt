@@ -1,7 +1,7 @@
 package hmo.projekt.structures.instance;
 
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -18,18 +18,19 @@ public class Shift {
     // slijediti ovu smjenu
     public HashSet<Integer> cantFollowShift;
     
-    public Shift( String line, List<Shift> shift, Map map ) {
-        String[] piece = line.split(",");
+    public Shift( String line, List<Shift> shift, HashMap<String, Integer> shiftMap ) {
         
-        this.id = piece[0];
+        String[] pieces = line.split(",");
+        
+        this.id = pieces[0];
         
 // mapping
-        map.shift.put(piece[0], shift.size());
-        this.lengthMinutes = Integer.parseInt(piece[1]);
+        shiftMap.put(pieces[0], shift.size());
+        this.lengthMinutes = Integer.parseInt(pieces[1]);
        
-        if(piece.length > 2 && piece[2] != null) {
+        if(pieces.length > 2 && pieces[2] != null) {
             this.cantFollowShift = new HashSet<>();
-            String[] shiftCantFollow = piece[2].split("\\|");
+            String[] shiftCantFollow = pieces[2].split("\\|");
             for (int i = 0; i < shiftCantFollow.length; i++){
 /* NAPOMENA: ovdje pretpostavljaš da su smjene koju su navedene u varijabli shiftCantFollow
                 već postavljene u listu svih smjena
