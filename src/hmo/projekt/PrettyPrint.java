@@ -31,6 +31,8 @@ public class PrettyPrint {
     
     public static void scheduleToFile(StaffSchedule schedule, Instance instance) {
         
+        System.out.println(" ******* Zapisujem raspored u datoteku result.txt *******");
+        
         PrintWriter writer;
         try {
             writer = new PrintWriter("result.txt", "UTF-8");
@@ -52,9 +54,9 @@ public class PrettyPrint {
         }
     }
     
-    public static void workerSchedule(int[] schedule, Instance instance){
+    public static void workerSchedule(int[] schedule, Instance instance, String workerId){
         
-         
+         System.out.println(" ************************* Raspored " + workerId+ "***************************");
         for(int day = 0; day < schedule.length;day ++) {
             if (schedule[day] != -1) {
                 System.out.print(day + " " + schedule[day]);

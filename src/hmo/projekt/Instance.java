@@ -81,7 +81,6 @@ public class Instance {
         } catch (IOException ex) {
             Logger.getLogger(Instance.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
         this.setWeekends();
     }
 
@@ -121,6 +120,23 @@ public class Instance {
                 
             }
         }
+//        int max = 0;
+//        int min = 0;
+//        int cover = 0;
+//        for(int i=0;i< this.shiftCover.length;i++){
+//            for(int j=0;j<this.shiftCover[i].length;j++){
+//                cover += this.shiftCover[i][j];
+//            }
+//        }
+//        
+//        
+//        for(Worker worker : this.staff){
+//            max += worker.maxShifts;
+//            min += worker.minShifts;
+//        }
+//        System.out.println(max + " > " + cover + " > " + min);
+//        
+//    //    System.exit(0);
     }
     
     private void readSectionHorizon () throws IOException {
@@ -157,15 +173,12 @@ public class Instance {
     
     private void readSectionDaysOff() throws IOException {
         String line;
-// NAPOMENA: pretpostavljam da su svi radnici navedeni u dijelu SECTION_DAYS_OFF
-// i da su istim redom napisani kako i u sekciji SECTION_STAFF
-        int i=0;
         while ((line = this.br.readLine()).length() != 0 ) {
             
             if(line.substring(0, 1).equals("#")) { continue; }
-            staff.get(i).setDaysOff(line, this.numberOfDays, this.numberOfShiftsPerDay );
-            i++;
             
+            String[] pieces = line.split(",");
+            staff.get(this.staffMap.get(pieces[0])).setDaysOff(pieces, this.numberOfDays);
         }
     }
     

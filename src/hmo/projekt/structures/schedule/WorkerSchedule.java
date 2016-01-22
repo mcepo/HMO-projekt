@@ -40,6 +40,7 @@ public class WorkerSchedule {
         this.maxWeekends = workerSchedule.maxWeekends;
         this.daysToMinDay = workerSchedule.daysToMinDay;
         this.daysToMaxDay = workerSchedule.daysToMaxDay;
+        this.fitness = workerSchedule.fitness;
     }
    
 // izračunava fitness za razmještaj tog korisnika

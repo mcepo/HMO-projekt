@@ -32,8 +32,8 @@ public class Worker {
     public int minShifts;
     public int maxShifts;
     
-// dani u kojima bi radnici mogli raditi
-    public HashSet<Integer> possibleDays ;
+// dani u kojima radnik ne smije raditi
+    public HashSet<Integer> daysOff ;
     
 // želje radnika u kojim smjenama bi htjeli raditi i u kojima nebi htjeli raditi
 //                    day     
@@ -49,7 +49,7 @@ public class Worker {
 
     public Worker(String line, HashMap<String, Integer> staffMap, List<Worker> staff, List<Shift> shifts, int numberOfShiftsPerDay) {
         
-        this.possibleDays = new HashSet<>();
+        this.daysOff = new HashSet<>();
         this.shiftOnRequest = new HashMap<>();
         this.shiftOffRequest = new HashMap<>();
         
@@ -82,35 +82,23 @@ public class Worker {
         this.minConsecutiveDaysOff = Integer.parseInt(piece[6]);
         this.maxWeekends = Integer.parseInt(piece[7]);
         
-        int count = 0;
-        
-        for (Integer shiftId : this.canWorkShift){
-            count += shifts.get(shiftId).lengthMinutes;
-        }
-        count = (int) (count/this.canWorkShift.size());
-        
-        this.maxShifts = (int)(this.maxTotalMinutes/count);
-        this.minShifts = (int)(this.minTotalMinutes/count);
-            
+        this.maxShifts = (int)(this.maxTotalMinutes/shifts.get(0).lengthMinutes);
+        this.minShifts = (int) Math.ceil(this.minTotalMinutes/shifts.get(0).lengthMinutes);
     }
     
-    public void setDaysOff (String line, int numberOfDays, int numberOfShiftsPerDay) {
+    public void setDaysOff (String[] pieces, int numberOfDays ) {
         
-        String[] pieces = line.split(",");
-        
-        for (int day = 0; day < numberOfDays ; day ++) {
-            if (Arrays.asList(pieces).contains(""+day)) { continue; }
-            possibleDays.add(day);
+        for (int index = 1; index < pieces.length ; index ++) {
+            this.daysOff.add(Integer.parseInt(pieces[index]));
         }
-        
-        this.calculateSpread();
+        this.calculateSpread(numberOfDays);
     }
 
-    public void calculateSpread() {
+    public void calculateSpread(int numberOfDays) {
         
-        int minDaysOff = this.possibleDays.size() - this.maxShifts;
-        int maxDaysOff = this.possibleDays.size() - this.minShifts;
-
+        int minDaysOff = numberOfDays - this.daysOff.size() - this.maxShifts;
+        int maxDaysOff = numberOfDays - this.daysOff.size() - this.minShifts;
+        
         int n;
         
         for (int consecutiveShifts = this.minConsecutiveShifts; consecutiveShifts <= this.maxConsecutiveShifts; consecutiveShifts ++) {
@@ -137,7 +125,7 @@ public class Worker {
                   //      "\n canWorkShift=" + canWorkShift + 
                         "\n shiftOnRequest=" + shiftOnRequest + 
                         "\n shiftOffRequest=" + shiftOffRequest + 
-                   //     "\n possibleDays=" + possibleDays +
+                   //     "\n daysOff=" + daysOff +
                         "}"
         );
         return "";
