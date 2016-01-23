@@ -50,9 +50,10 @@ public class Algorithm {
         while (!this.isSatisfying(population)){
             for(int i = 0; i < this.POPULATION_SIZE -1 ; i++){
                 StaffSchedule offspring = crossover.apply(population.get(i), population.get(i + 1), instance);
-             //   offspring = mutate.apply(offspring);          
+             
+                Mutate.apply(offspring, generator, instance);  
+                Corrections.balanceDayShifts(offspring, instance);
                 offspring.calculateFitness(this.instance.weightForShiftCoverUnder, this.instance.weightForShiftCoverOver);
-
                 population.add(offspring);
             }
             Collections.sort(population);

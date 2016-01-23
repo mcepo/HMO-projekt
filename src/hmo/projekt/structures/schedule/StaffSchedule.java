@@ -1,23 +1,20 @@
 package hmo.projekt.structures.schedule;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  *
  * @author Marko
  */
 public class StaffSchedule  implements Comparable<StaffSchedule>{
     
-    public List<WorkerSchedule> workerSchedules;
+    public WorkerSchedule[] workerSchedules;
  
     public int[][] shiftCover;
     public Integer totalFitness;
     
-    public StaffSchedule ( int numberOfDays, int numberOfShiftsPerDay ){
+    public StaffSchedule ( int numberOfDays, int numberOfShiftsPerDay, int numberOfWorkers ){
         
         this.totalFitness = 0;
-        this.workerSchedules = new ArrayList<>();
+        this.workerSchedules = new WorkerSchedule[numberOfWorkers];
         this.shiftCover = new int[numberOfDays][numberOfShiftsPerDay];
     }
 

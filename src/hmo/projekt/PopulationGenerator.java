@@ -24,7 +24,7 @@ public class PopulationGenerator {
 
     public StaffSchedule generateStaffSchedule() {
         
-        this.staffSchedule = new StaffSchedule(instance.numberOfDays, instance.numberOfShiftsPerDay);
+        this.staffSchedule = new StaffSchedule(instance.numberOfDays, instance.numberOfShiftsPerDay, instance.numberOfWorkers);
         
         WorkerSchedule workerSchedule;
         
@@ -32,8 +32,7 @@ public class PopulationGenerator {
             
             while ((workerSchedule = this.generateWorkerSchedule(workerId)) == null ) { }
             workerSchedule.calculateFitness(this.instance.staff.get(workerId), this.instance.numberOfDays);
-            this.staffSchedule.totalFitness += workerSchedule.fitness;
-            this.staffSchedule.workerSchedules.add(workerSchedule);
+            this.staffSchedule.workerSchedules[workerId] = workerSchedule;
         }
         Corrections.balanceDayShifts(staffSchedule, instance);
         this.staffSchedule.calculateFitness(this.instance.weightForShiftCoverUnder, this.instance.weightForShiftCoverOver);
