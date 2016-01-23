@@ -14,7 +14,7 @@ public class Algorithm {
     
     private final int POPULATION_SIZE = 50;
     private final int OPTIMAL_SOLUTION  = 0;
-    private final int MAX_ITERATIONS = 500;
+    private final int MAX_ITERATIONS = 200;
     
     private int bestFitness;
     private int iteration;
@@ -75,7 +75,7 @@ public class Algorithm {
         } else {
             -- this.iteration;
         }
-        System.out.println("Current best result: "+ bestFitness );
+        System.out.println("Current best result: "+ bestFitness + " iteration " + this.iteration);
     //    this.dumpPopulationFitness();
         return (bestFitness <= OPTIMAL_SOLUTION || this.iteration == 0 ) ;
     }
