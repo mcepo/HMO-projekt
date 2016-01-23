@@ -185,7 +185,7 @@ public class PopulationGenerator {
         }
     }
     
-    private void dumpGeneratedWorkerSchedule (Worker worker, maxWeekends) {
+    private void dumpGeneratedWorkerSchedule (Worker worker, int maxWeekends, int workDays) {
         System.out.println(
                 worker.id + 
                 " { " + 
