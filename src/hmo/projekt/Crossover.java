@@ -10,12 +10,13 @@ import java.util.List;
  */
 public class Crossover {
     
-    public StaffSchedule apply(StaffSchedule first, StaffSchedule second, int[][] shiftCover){
+    public StaffSchedule apply(StaffSchedule first, StaffSchedule second, Instance instance){
         
-        StaffSchedule result = new StaffSchedule(shiftCover); 
+        StaffSchedule result = new StaffSchedule(instance.numberOfDays, instance.numberOfShiftsPerDay); 
         int crossPoint = (int)(Math.random() * first.workerSchedules.size());
         merge(first.workerSchedules, result.workerSchedules, 0, crossPoint);
         merge(second.workerSchedules, result.workerSchedules, crossPoint, second.workerSchedules.size());
+        Corrections.balanceDayShifts(result, instance);
         return result;
     }
 

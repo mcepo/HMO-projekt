@@ -14,24 +14,17 @@ public class StaffSchedule  implements Comparable<StaffSchedule>{
     public int[][] shiftCover;
     public Integer totalFitness;
     
-    public StaffSchedule ( int[][] shiftCover){
+    public StaffSchedule ( int numberOfDays, int numberOfShiftsPerDay ){
         
         this.totalFitness = 0;
         this.workerSchedules = new ArrayList<>();
-        
-        this.shiftCover = new int[shiftCover.length][];
-        for(int i = 0; i < shiftCover.length; i++)
-        {
-            this.shiftCover[i] = new int[shiftCover[i].length];
-            System.arraycopy(shiftCover[i], 0, this.shiftCover[i], 0, shiftCover[i].length);
-        }
+        this.shiftCover = new int[numberOfDays][numberOfShiftsPerDay];
     } 
 
 // iznačunava fitness za svaku smjenu posebno i ukupni fitness
     public void calculateFitness( int weightForShiftCoverUnder, int weightForShiftCoverOver) {
         
-        this.calculateShiftCover();
-
+        totalFitness = 0;
         
         for (int day = 0; day < this.shiftCover.length; day ++) {
             for(int shift=0;shift < this.shiftCover[day].length; shift ++){
@@ -44,32 +37,17 @@ public class StaffSchedule  implements Comparable<StaffSchedule>{
                 }
             }
         }
-        
         this.addWorkerFitness();
     }
-    
-    // iznačunava fitness za svaku smjenu posebno i ukupni fitness
-    public void calculateFitnessWithCover( int weightForShiftCoverUnder, int weightForShiftCoverOver) {
 
-        this.totalFitness = 0;
+    public void calculateShiftCover(int[][] shiftCover) {
         
-        for (int day = 0; day < this.shiftCover.length; day ++) {
-            for(int shift=0;shift < this.shiftCover[day].length; shift ++){
-    // imam previše ljudi u smjeni
-                if (this.shiftCover[day][shift] < 0) {
-                    totalFitness += Math.abs(this.shiftCover[day][shift]) * weightForShiftCoverOver;
-    // imam premalo ljudi u smjeni
-                } else {
-                    this.totalFitness += this.shiftCover[day][shift] * weightForShiftCoverUnder;
-                }
+        for(int day = 0;day < shiftCover.length;day ++) {
+            for(int shift = 0 ; shift < shiftCover[day].length; shift ++){
+                this.shiftCover[day][shift] = shiftCover[day][shift];
             }
         }
-        
-        this.addWorkerFitness();
-    }
 
-    public void calculateShiftCover() {
-        
         for(WorkerSchedule workerSchedule : this.workerSchedules) {
             for(int day = 0; day < workerSchedule.schedule.length; day ++) {
                 
@@ -78,6 +56,7 @@ public class StaffSchedule  implements Comparable<StaffSchedule>{
                 }
             }
         }
+        
     }
     private void addWorkerFitness() {
         
