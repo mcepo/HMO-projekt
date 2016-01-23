@@ -3,7 +3,6 @@ package hmo.projekt.structures.schedule;
 import hmo.projekt.Instance;
 import hmo.projekt.structures.instance.Request;
 import hmo.projekt.structures.instance.Worker;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -41,6 +40,7 @@ public class WorkerSchedule {
         this.daysToMinDay = workerSchedule.daysToMinDay;
         this.daysToMaxDay = workerSchedule.daysToMaxDay;
         this.fitness = workerSchedule.fitness;
+        
     }
    
 // izračunava fitness za razmještaj tog korisnika

@@ -14,7 +14,7 @@ public class Algorithm {
     
     private final int POPULATION_SIZE = 50;
     private final int OPTIMAL_SOLUTION  = 0;
-    private int MAX_ITERATIONS = 500;
+    private final int MAX_ITERATIONS = 500;
     
     private int bestFitness;
     private int iteration;

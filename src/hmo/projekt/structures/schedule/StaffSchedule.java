@@ -19,7 +19,7 @@ public class StaffSchedule  implements Comparable<StaffSchedule>{
         this.totalFitness = 0;
         this.workerSchedules = new ArrayList<>();
         this.shiftCover = new int[numberOfDays][numberOfShiftsPerDay];
-    } 
+    }
 
 // iznačunava fitness za svaku smjenu posebno i ukupni fitness
     public void calculateFitness( int weightForShiftCoverUnder, int weightForShiftCoverOver) {
@@ -63,18 +63,6 @@ public class StaffSchedule  implements Comparable<StaffSchedule>{
         for(WorkerSchedule workerSchedule : this.workerSchedules) {
             totalFitness += workerSchedule.fitness;
         }
-    }
-
-    @Override
-    public String toString() {
-        
-        System.out.println(
-         "StaffSchedule{" +
-                 "\n shiftCover= " + shiftCover + 
-                 "\n totalFitness= " + totalFitness + 
-                 '}'
-        );
-        return "";
     }
 
     @Override
