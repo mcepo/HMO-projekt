@@ -53,8 +53,7 @@ public class WorkerSchedule {
             Integer day = shiftOnRequest.getKey();
             Request request = shiftOnRequest.getValue();
             
-            if (     this.schedule[day] == -1 
-                || ( this.schedule[day] != -1 && this.schedule[day] != request.shift ) ) {
+            if ( this.schedule[day] != request.shift ) {
                 this.fitness += request.weight;
             }
         }
@@ -63,7 +62,7 @@ public class WorkerSchedule {
             Integer day = shiftOffRequest.getKey();
             Request request = shiftOffRequest.getValue();
             
-            if ( (this.schedule[day] != -1) && (this.schedule[day] == request.shift ) ) {
+            if ( this.schedule[day] == request.shift ) {
                 this.fitness += request.weight;
             }
         }

@@ -1,5 +1,7 @@
-package hmo.projekt;
+package hmo.projekt.Algorithm;
 
+import hmo.projekt.Instance;
+import hmo.projekt.PopulationGenerator;
 import hmo.projekt.structures.schedule.StaffSchedule;
 import hmo.projekt.structures.schedule.WorkerSchedule;
 

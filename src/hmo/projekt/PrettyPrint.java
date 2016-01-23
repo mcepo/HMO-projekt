@@ -29,13 +29,11 @@ public class PrettyPrint {
         }
     }
     
-    public static void scheduleToFile(StaffSchedule schedule, Instance instance) {
-        
-        System.out.println(" ******* Zapisujem raspored u datoteku result.txt *******");
+    public static void scheduleToFile(StaffSchedule schedule, Instance instance, String filename) {
         
         PrintWriter writer;
         try {
-            writer = new PrintWriter("result.txt", "UTF-8");
+            writer = new PrintWriter(filename, "UTF-8");
             for(WorkerSchedule workerSchedule : schedule.workerSchedules) {
             
             for(int day=0; day < workerSchedule.schedule.length; day++ ) {

@@ -1,5 +1,6 @@
 package hmo.projekt;
 
+import hmo.projekt.Algorithm.Corrections;
 import hmo.projekt.structures.instance.Worker;
 import hmo.projekt.structures.schedule.StaffSchedule;
 import hmo.projekt.structures.schedule.WorkerSchedule;
@@ -34,7 +35,9 @@ public class PopulationGenerator {
             workerSchedule.calculateFitness(this.instance.staff.get(workerId), this.instance.numberOfDays);
             this.staffSchedule.workerSchedules[workerId] = workerSchedule;
         }
+  //      this.staffSchedule.calculateShiftCover(instance.shiftCover);
         Corrections.balanceDayShifts(staffSchedule, instance);
+   //     this.staffSchedule.calculateShiftCover(instance.shiftCover);
         this.staffSchedule.calculateFitness(this.instance.weightForShiftCoverUnder, this.instance.weightForShiftCoverOver);
         return staffSchedule;
     }
@@ -48,6 +51,7 @@ public class PopulationGenerator {
         for(int i=0;i<schedule.length;i++){
             schedule[i] = -1;
         }
+        
         int workDays = 0;
         int day = 0;
         
@@ -57,7 +61,6 @@ public class PopulationGenerator {
             consecutiveDaysOff = 2;
         } else {
             day = (int)(Math.random() * worker.spreadDaysOff.get(worker.spreadDaysOff.size() - 1)) + 2;
-      //      System.out.println("Initial free days " + day );
             consecutiveDaysOn = 0;
         }
         int shift ;
@@ -170,8 +173,7 @@ public class PopulationGenerator {
                 daysOff = 0;
             }
         }
- 
-    //    PrettyPrint.workerSchedule(schedule, instance);
+
         if ((worker.maxShifts >= workDays) && (workDays > worker.minShifts) && maxWeekends >= 0) {
             
             return new WorkerSchedule(  schedule, 

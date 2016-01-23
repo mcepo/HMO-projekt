@@ -1,6 +1,8 @@
 
 package hmo.projekt;
 
+import hmo.projekt.Algorithm.Algorithm;
+
 /**
  *
  * @author Marko

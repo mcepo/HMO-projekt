@@ -8,6 +8,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -51,6 +53,11 @@ public class Instance {
 // instancira se tek nakon što znamo ukupan broj ljudi i smjena
     public HashMap<String, Integer> staffMap;
     public HashMap<String, Integer> shiftMap;
+    
+// radnici poslagani po broju smjena u kojima mogu raditi
+    public List<Integer> workersByAllowedNumberOfShifts = new ArrayList<>();
+    
+    
     
     private enum DataType{
         SECTION_HORIZON, SECTION_SHIFTS, SECTION_STAFF,
@@ -120,6 +127,9 @@ public class Instance {
                 
             }
         }
+        
+ //       this.orderWorkers();
+        
 //        int max = 0;
 //        int min = 0;
 //        int cover = 0;
@@ -237,11 +247,21 @@ public class Instance {
         }
     }
     
+// generiranje doadnih struktura koje će trebati kasnije genetskom algoritmu    
+    
     private void setWeekends () {
 
         for(int day = 5; day < this.numberOfDays; day += 7) {
             this.weekendShiftsSaturday.add(day);
             this.weekendShiftsSunday.add(day+1);
         }
+    }
+    
+    private void orderWorkers() {
+            
+        Collections.sort(this.staff, (Worker o1, Worker o2) -> o1.canWorkShift.size() - o2.canWorkShift.size());
+        this.staff.stream().forEach((worker) -> {
+            this.workersByAllowedNumberOfShifts.add(this.staffMap.get(worker.id));
+        });
     }
 }
