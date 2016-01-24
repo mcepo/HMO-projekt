@@ -1,7 +1,7 @@
 
 package hmo.projekt;
 
-import hmo.projekt.Algorithm.Algorithm;
+import hmo.projekt.GeneticAlgorithm.Algorithm;
 
 /**
  *

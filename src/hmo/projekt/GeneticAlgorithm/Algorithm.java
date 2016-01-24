@@ -1,4 +1,4 @@
-package hmo.projekt.Algorithm;
+package hmo.projekt.GeneticAlgorithm;
 
 import hmo.projekt.Instance;
 import hmo.projekt.PopulationGenerator;
@@ -69,7 +69,7 @@ public class Algorithm {
                 this.crossover.apply(population.get(i), population.get(i + 1), this.instance, offspring);
                 this.mutate.apply(offspring, generator, this.instance); 
                 offspring.calculateShiftCover(this.instance.shiftCover);
-        //        this.corrections.balanceDayShifts(offspring, instance);
+                this.corrections.balanceDayShifts(offspring, instance);
                 offspring.calculateFitness(this.instance);
                 if (Algorithm.isFeasible(offspring, instance)) {
                     population.add(offspring);

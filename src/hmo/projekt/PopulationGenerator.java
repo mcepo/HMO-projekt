@@ -1,6 +1,6 @@
 package hmo.projekt;
 
-import hmo.projekt.Algorithm.Corrections;
+import hmo.projekt.GeneticAlgorithm.Corrections;
 import hmo.projekt.structures.instance.Worker;
 import hmo.projekt.structures.schedule.StaffSchedule;
 import hmo.projekt.structures.schedule.WorkerSchedule;
@@ -25,7 +25,7 @@ public class PopulationGenerator {
 
     public StaffSchedule generateStaffSchedule() {
         
-        this.staffSchedule = new StaffSchedule(instance.numberOfDays, instance.numberOfShiftsPerDay, instance.numberOfWorkers);
+        this.staffSchedule = new StaffSchedule(this.instance);
         
         WorkerSchedule workerSchedule;
         
@@ -35,10 +35,11 @@ public class PopulationGenerator {
             workerSchedule.calculateFitness(this.instance.staff.get(workerId), this.instance.numberOfDays);
             this.staffSchedule.workerSchedules[workerId] = workerSchedule;
         }
-  //      this.staffSchedule.calculateShiftCover(instance.shiftCover);
-        Corrections.balanceDayShifts(staffSchedule, instance);
-   //     this.staffSchedule.calculateShiftCover(instance.shiftCover);
-        this.staffSchedule.calculateFitness(this.instance.weightForShiftCoverUnder, this.instance.weightForShiftCoverOver);
+     //   this.staffSchedule.calculateShiftCover(instance.shiftCover);
+        this.corrections.balanceDayShifts(staffSchedule, instance);
+   //     this.staffSchedule.calculateShiftCover(instance.spaceInShift);
+                
+        this.staffSchedule.calculateFitness(this.instance);
         return staffSchedule;
     }
     

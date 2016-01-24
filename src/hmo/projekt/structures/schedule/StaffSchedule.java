@@ -1,5 +1,7 @@
 package hmo.projekt.structures.schedule;
 
+import hmo.projekt.Instance;
+
 /**
  *
  * @author Marko
@@ -8,23 +10,23 @@ public class StaffSchedule  implements Comparable<StaffSchedule>{
     
     public WorkerSchedule[] workerSchedules;
  
-    public int[][] shiftCover;
+    public int[][] spaceInShift;
     public Integer fitness;
     public int shiftFitness;
     public int staffFitness;
     
-    public StaffSchedule ( int numberOfDays, int numberOfShiftsPerDay, int numberOfWorkers ){
+    public StaffSchedule ( Instance instance ){
         
         this.fitness = 0;
         this.shiftFitness = 0;
         this.staffFitness = 0;
-        this.workerSchedules = new WorkerSchedule[numberOfWorkers];
-        this.shiftCover = new int[numberOfDays][numberOfShiftsPerDay];
+        this.workerSchedules = new WorkerSchedule[instance.numberOfWorkers];
+        this.spaceInShift = new int[instance.numberOfDays][instance.numberOfShiftsPerDay];
     }
     
-    public void calculateFitness(int weightForShiftCoverUnder, int weightForShiftCoverOver){
+    public void calculateFitness(Instance instance){
         
-        this.fitness = this.calculateShiftFitness(weightForShiftCoverUnder, weightForShiftCoverOver) + this.calculateStaffFitness();  
+        this.fitness = this.calculateShiftFitness(instance.weightForShiftCoverUnder, instance.weightForShiftCoverOver) + this.calculateStaffFitness();  
     }
     
 // iznačunava fitness za svaku smjenu posebno i ukupni fitness
@@ -32,18 +34,18 @@ public class StaffSchedule  implements Comparable<StaffSchedule>{
         
         this.shiftFitness = 0;
         
-        for (int day = 0; day < this.shiftCover.length; day ++) {
-            for(int shift=0;shift < this.shiftCover[day].length; shift ++){
-    // imam previše ljudi u smjeni
-                if (this.shiftCover[day][shift] < 0) {
-                    this.shiftFitness += Math.abs(this.shiftCover[day][shift]) * weightForShiftCoverOver;
-    // imam premalo ljudi u smjeni
-                } else {
-                    this.shiftFitness += this.shiftCover[day][shift] * weightForShiftCoverUnder;
+        for (int day = 0; day < this.spaceInShift.length; day ++) {
+            for(int shift=0;shift < this.spaceInShift[day].length; shift ++){
+                if (this.spaceInShift[day][shift] < 0) {
+                // imam previše ljudi u smjeni
+                    this.shiftFitness += (Math.abs(this.spaceInShift[day][shift]) * weightForShiftCoverOver);
+                } else if (this.spaceInShift[day][shift] > 0){
+                // imam premalo ljudi u smjeni
+                    this.shiftFitness += (this.spaceInShift[day][shift] * weightForShiftCoverUnder);
                 }
             }
         }
-        
+
         return this.shiftFitness;
     }
  
@@ -58,18 +60,16 @@ public class StaffSchedule  implements Comparable<StaffSchedule>{
     }
     
     public void calculateShiftCover(int[][] shiftCover) {
-        
-        for(int day = 0;day < shiftCover.length;day ++) {
-            for(int shift = 0 ; shift < shiftCover[day].length; shift ++){
-                this.shiftCover[day][shift] = shiftCover[day][shift];
-            }
+
+        for(int day = 0;day < spaceInShift.length;day ++) {
+            System.arraycopy(shiftCover[day], 0, this.spaceInShift[day], 0, shiftCover[day].length);
         }
 
         for(WorkerSchedule workerSchedule : this.workerSchedules) {
             for(int day = 0; day < workerSchedule.schedule.length; day ++) {
                 
                 if(workerSchedule.schedule[day] != -1) {
-                    -- this.shiftCover[day][workerSchedule.schedule[day]];
+                    this.spaceInShift[day][workerSchedule.schedule[day]] --;
                 }
             }
         }

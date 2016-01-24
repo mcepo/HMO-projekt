@@ -1,4 +1,4 @@
-package hmo.projekt.Algorithm;
+package hmo.projekt.GeneticAlgorithm;
 
 import hmo.projekt.Instance;
 import hmo.projekt.PopulationGenerator;
@@ -13,7 +13,7 @@ public class Mutate {
     
     private static final double PROBABILITY = 0.1;
     
-    public static void apply (StaffSchedule staffSchedule, PopulationGenerator generator, Instance instance) {
+    public void apply (StaffSchedule staffSchedule, PopulationGenerator generator, Instance instance) {
         
         WorkerSchedule workerSchedule;
         

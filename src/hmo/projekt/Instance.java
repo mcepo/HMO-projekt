@@ -8,8 +8,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -128,8 +126,6 @@ public class Instance {
             }
         }
         
- //       this.orderWorkers();
-        
 //        int max = 0;
 //        int min = 0;
 //        int cover = 0;
@@ -235,15 +231,10 @@ public class Instance {
             day = Integer.parseInt(pieces[0]);
             shift = shiftMap.get(pieces[1]);
             cover = Integer.parseInt(pieces[2]);
-            weightForShiftCoverUnder = Integer.parseInt(pieces[3]);
-            weightForShiftCoverOver =Integer.parseInt(pieces[4]);
+            this.weightForShiftCoverUnder = Integer.parseInt(pieces[3]);
+            this.weightForShiftCoverOver =Integer.parseInt(pieces[4]);
             
             this.shiftCover[day][shift] = cover;
-
-            if(this.weightForShiftCoverUnder == 0) {
-                this.weightForShiftCoverUnder = Integer.parseInt(pieces[3]);
-                this.weightForShiftCoverOver = Integer.parseInt(pieces[4]);
-            }
         }
     }
     
@@ -255,13 +246,5 @@ public class Instance {
             this.weekendShiftsSaturday.add(day);
             this.weekendShiftsSunday.add(day+1);
         }
-    }
-    
-    private void orderWorkers() {
-            
-        Collections.sort(this.staff, (Worker o1, Worker o2) -> o1.canWorkShift.size() - o2.canWorkShift.size());
-        this.staff.stream().forEach((worker) -> {
-            this.workersByAllowedNumberOfShifts.add(this.staffMap.get(worker.id));
-        });
     }
 }
