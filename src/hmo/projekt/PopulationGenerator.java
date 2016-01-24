@@ -176,8 +176,11 @@ public class PopulationGenerator {
 //            }
 //        }
 
-    //    if ((worker.maxShifts >= workDays) && (workDays > worker.minShifts) && maxWeekends >= 0) {
-       if (Algorithm.isFeasible(schedule, instance, workerId)) {    
+        if ((worker.maxShifts >= workDays) && (workDays > worker.minShifts) && maxWeekends >= 0) {
+     
+        
+        // SAMO GORNJU LINIJU ZAKOMENTRAJ I DOLJNJU LINIJU ODKOMENTIRAJ
+     //   if (Algorithm.isFeasible(schedule, instance, workerId)) {    
             return new WorkerSchedule(  schedule, 
                                         workerId, 
                                         maxWeekends, 
