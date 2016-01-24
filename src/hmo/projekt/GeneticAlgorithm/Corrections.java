@@ -53,5 +53,6 @@ public class Corrections {
             workerSchedule.calculateFitness(worker, instance.numberOfDays);
          //   System.exit(-1);
         }
+        staffSchedule.calculateShiftCover(instance.shiftCover);
     }
 }
