@@ -67,17 +67,57 @@ public class Algorithm {
     
     public void solve () {
         
-        int parent_1, parent_2;
+        int parent_1 = -1, parent_2 = -1;
+        double totalFitness;
+        double currFitness_1;
+        double currFitness_2;
+        int index;
         
         while (!this.isSatisfying(population)){
-            parent_1 = 0;
-            parent_2 = 0;
+            totalFitness = 0;
+            for (int i=0;i< population.size();i++){
+               
+                totalFitness += (double) ((double) population.get(0).fitness/(double)population.get(i).fitness );
+                
+            }
+       //     System.out.println(totalFitness);
+            
             for(int i = this.NUMBER_OF_PARENTS; i < this.POPULATION_SIZE ; i++){
                 
-                while (parent_1 == parent_2) {
-                    parent_1 = (int) (Math.random()*this.NUMBER_OF_PARENTS);
-                    parent_2 = (int) (Math.random()*this.NUMBER_OF_PARENTS);
+                parent_1 = -1;
+                parent_2 = -1;
+                
+                while (parent_1 == parent_2 || parent_1 == -1 || parent_2 == -1) {
+
+                    currFitness_1 = (Math.random()*totalFitness);
+                    currFitness_2 = (Math.random()*totalFitness);
+                    
+             //       System.out.println("currFitness_1 " + currFitness_1);
+             //       System.out.println("currFitness_2 " + currFitness_2);
+                    
+                    parent_1 = -1;
+                    parent_2 = -1;
+                    
+                    for(int j=0;j<population.size() && (parent_1 == -1 || parent_2 == -1);j++){
+                        
+                        currFitness_1 -= (double)((double)population.get(0).fitness/(double)population.get(i).fitness );
+                        currFitness_2 -= (double)((double)population.get(0).fitness/(double)population.get(i).fitness );
+                        
+                 //       System.out.println("currFitness_1 " + currFitness_1);
+                //        System.out.println("currFitness_2 " + currFitness_2);
+                        if (currFitness_1 <= 0 && parent_1 == -1) {
+                            parent_1 = j;
+                  //          System.out.println("parent_1 "  + parent_1);
+                        }
+                        
+                        if (currFitness_2 <= 0 && parent_2 == -1) {
+                            parent_2 = j;
+                   //         System.out.println("parent_2 "  + parent_2);
+                        }
+                    }
                 }
+                
+          //      System.out.println("Roditelji " + parent_1 + " " + parent_2);
                 
                 StaffSchedule offspring = new StaffSchedule(this.instance);
                 
@@ -87,6 +127,7 @@ public class Algorithm {
                 this.corrections.balanceDayShifts(offspring, instance);
                 offspring.calculateFitness(this.instance);
                 population.add(offspring);
+                
             }
             Collections.sort(population);
             population.subList(this.NUMBER_OF_PARENTS, this.POPULATION_SIZE).clear();
