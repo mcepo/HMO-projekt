@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -52,8 +53,9 @@ public class Instance {
     public HashMap<String, Integer> staffMap;
     public HashMap<String, Integer> shiftMap;
     
-// radnici poslagani po broju smjena u kojima mogu raditi
-    public List<Integer> workersByAllowedNumberOfShifts = new ArrayList<>();
+    public HashMap<Integer, Double> rouletteWheelForMutate;
+    
+    public HashSet<Integer> servingOrderDayShiftCorrections;
     
     
     
@@ -76,6 +78,8 @@ public class Instance {
         
         this.staff = new ArrayList<>();
         this.shifts = new ArrayList<>(); 
+        
+        this.rouletteWheelForMutate = new HashMap<>();
         
         try {
             this.br = new BufferedReader(new FileReader(filePath));
@@ -126,23 +130,9 @@ public class Instance {
             }
         }
         
-//        int max = 0;
-//        int min = 0;
-//        int cover = 0;
-//        for(int i=0;i< this.shiftCover.length;i++){
-//            for(int j=0;j<this.shiftCover[i].length;j++){
-//                cover += this.shiftCover[i][j];
-//            }
-//        }
-//        
-//        
-//        for(Worker worker : this.staff){
-//            max += worker.maxShifts;
-//            min += worker.minShifts;
-//        }
-//        System.out.println(max + " > " + cover + " > " + min);
-//        
-//    //    System.exit(0);
+        for (int i=0; i< this.staff.size();i++){
+            this.rouletteWheelForMutate.put(i, ((double)this.staff.get(this.numberOfWorkers -1 ).maxShifts/(double)this.staff.get(i).maxShifts) );
+        }
     }
     
     private void readSectionHorizon () throws IOException {
@@ -170,6 +160,7 @@ public class Instance {
         while ((line = this.br.readLine()).length() != 0 ) {
             
             if(line.substring(0, 1).equals("#")) { continue; }
+            
             Worker singleStaff = new Worker(line, this.staffMap, this.staff, this.shifts, this.numberOfShiftsPerDay);
 
             this.staff.add(singleStaff);

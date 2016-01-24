@@ -1,7 +1,6 @@
 package hmo.projekt.structures.schedule;
 
 import hmo.projekt.Instance;
-import java.util.Arrays;
 
 /**
  *
@@ -16,6 +15,8 @@ public class StaffSchedule  implements Comparable<StaffSchedule>{
     public int shiftFitness;
     public int staffFitness;
     
+    public int[] spaceInDay;
+    
     public StaffSchedule ( Instance instance ){
         
         this.fitness = 0;
@@ -23,6 +24,7 @@ public class StaffSchedule  implements Comparable<StaffSchedule>{
         this.staffFitness = 0;
         this.workerSchedules = new WorkerSchedule[instance.numberOfWorkers];
         this.spaceInShift = new int[instance.numberOfDays][instance.numberOfShiftsPerDay];
+        this.spaceInDay = new int[instance.numberOfDays];
     }
     
     public void calculateFitness(Instance instance){

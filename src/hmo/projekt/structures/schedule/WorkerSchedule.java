@@ -18,14 +18,14 @@ public class WorkerSchedule {
 // pretpostavljam da će mi trebati kod zamjena dana
     public int maxWeekends;
     
-    public int daysOn;
+    public int workload;
 
-    public WorkerSchedule(int[] schedule, int workerId, int maxWeekends, int daysOn) {
+    public WorkerSchedule(int[] schedule, int workerId, int maxWeekends, int workload) {
         
         this.schedule = schedule;
         this.workerId = workerId;
         this.maxWeekends = maxWeekends;
-        this.daysOn = daysOn;
+        this.workload = workload;
     }
 
     public WorkerSchedule(WorkerSchedule workerSchedule) {
@@ -33,7 +33,7 @@ public class WorkerSchedule {
         this.schedule = workerSchedule.schedule;
         this.workerId = workerSchedule.workerId;
         this.maxWeekends = workerSchedule.maxWeekends;
-        this.daysOn = workerSchedule.daysOn;
+        this.workload = workerSchedule.workload;
         this.fitness = workerSchedule.fitness;
         
     }

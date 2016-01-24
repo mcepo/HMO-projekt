@@ -1,6 +1,5 @@
 package hmo.projekt;
 
-import hmo.projekt.GeneticAlgorithm.Algorithm;
 import hmo.projekt.GeneticAlgorithm.Corrections;
 import hmo.projekt.structures.instance.Worker;
 import hmo.projekt.structures.schedule.StaffSchedule;
@@ -36,9 +35,10 @@ public class PopulationGenerator {
             workerSchedule.calculateFitness(this.instance.staff.get(workerId), this.instance.numberOfDays);
             this.staffSchedule.workerSchedules[workerId] = workerSchedule;
         }
-     //   this.staffSchedule.calculateShiftCover(instance.shiftCover);
-        this.corrections.balanceDayShifts(staffSchedule, instance);
-   //     this.staffSchedule.calculateShiftCover(instance.spaceInShift);
+        this.staffSchedule.calculateShiftCover(instance.shiftCover);
+     //   this.corrections.removeWorkers(staffSchedule, instance);
+        this.corrections.balanceDayShifts(this.staffSchedule, instance);
+        this.staffSchedule.calculateShiftCover(instance.shiftCover);
                 
         this.staffSchedule.calculateFitness(this.instance);
         return staffSchedule;
@@ -54,7 +54,7 @@ public class PopulationGenerator {
             schedule[i] = -1;
         }
         
-        int workDays = 0;
+        int workload = 0;
         int day = 0;
         
         if (Math.random() > 0.5 ){
@@ -72,7 +72,7 @@ public class PopulationGenerator {
         
         List<Integer> allowedShiftsInNextDay = new ArrayList<>(worker.canWorkShift);
         
-        while (day < this.instance.numberOfDays && workDays <= worker.maxShifts ) {
+        while (day < this.instance.numberOfDays && workload <= worker.maxShifts ) {
 
             if (worker.daysOff.contains(day) == true ) { 
                 ++ day;
@@ -114,7 +114,7 @@ public class PopulationGenerator {
             shift = allowedShiftsInNextDay.get((int)(Math.random() * allowedShiftsInNextDay.size())); 
             schedule[day] = shift;
             
-            workDays ++;
+            workload ++;
 
             if ( this.instance.weekendShiftsSaturday.contains(day) || 
                  ( this.instance.weekendShiftsSunday.contains(day) &&  schedule[day-1] == -1)) {
@@ -149,7 +149,7 @@ public class PopulationGenerator {
                 if (consecutiveDaysOn < worker.minConsecutiveShifts) {
                     for (;consecutiveDaysOn != 0; consecutiveDaysOn --) {
                         schedule[day - consecutiveDaysOn] = -1;
-                        -- workDays;
+                        -- workload;
                     }
                 }
                 consecutiveDaysOn = 0;
@@ -176,7 +176,7 @@ public class PopulationGenerator {
             }
         }
 
-        if ((worker.maxShifts >= workDays) && (workDays > worker.minShifts) && maxWeekends >= 0) {
+        if ((worker.maxShifts >= workload) && (workload > worker.minShifts) && maxWeekends >= 0) {
      
         
         // SAMO GORNJU LINIJU ZAKOMENTRAJ I DOLJNJU LINIJU ODKOMENTIRAJ
@@ -184,7 +184,7 @@ public class PopulationGenerator {
             return new WorkerSchedule(  schedule, 
                                         workerId, 
                                         maxWeekends, 
-                                        workDays);
+                                        workload);
         } else {
             return null;
         }

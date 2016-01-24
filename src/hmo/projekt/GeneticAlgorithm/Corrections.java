@@ -1,6 +1,7 @@
 package hmo.projekt.GeneticAlgorithm;
 
 import hmo.projekt.Instance;
+import hmo.projekt.PrettyPrint;
 import hmo.projekt.structures.instance.Worker;
 import hmo.projekt.structures.schedule.StaffSchedule;
 import hmo.projekt.structures.schedule.WorkerSchedule;
@@ -11,9 +12,62 @@ import hmo.projekt.structures.schedule.WorkerSchedule;
  */
 public class Corrections {
     
-    public void balanceDayShifts( StaffSchedule staffSchedule, Instance instance ) { 
+    public void removeWorkers (StaffSchedule staffSchedule, Instance instance) {
         
         staffSchedule.calculateShiftCover(instance.shiftCover);
+        
+        int daysOff;
+        int daysOn;
+        
+        for(WorkerSchedule workerSchedule : staffSchedule.workerSchedules){
+ 
+            Worker worker = instance.staff.get(workerSchedule.workerId);
+            PrettyPrint.workerSchedule(workerSchedule.schedule, instance, null);
+            
+            daysOn=0;
+            daysOff=0;
+            
+            for(int day = 1; day < workerSchedule.schedule.length; day ++ ) {
+           
+                //// VIKENDI !!!!!!!!!!!!!!!!
+                
+                if (workerSchedule.schedule[day] == -1 ){
+ // neradan dan
+                    daysOff ++;
+                    
+                    if (daysOn > worker.minConsecutiveShifts && workerSchedule.workload > worker.minShifts) {
+                        // mogu maknuti dan
+                        System.out.println("Mogu MAKNUTI radni dan " + (day-1));
+                        if (staffSchedule.spaceInShift[day-1][workerSchedule.schedule[day-1]] < 0 ) {
+                            System.out.println("POGODAN " + (day-1));
+                        }
+                        
+                        // PROVJERI VIKEND I DODAJ U maxWeekends AKO JE
+                    }
+                    
+                    daysOn = 0;
+                }else {
+// radni dan
+                    daysOn++;
+                    
+                    if (daysOff > worker.minConsecutiveDaysOff && workerSchedule.workload < worker.maxShifts){
+                        
+                        System.out.println("Mogu DODATI radni dan " + (day -1));
+                        
+                        for(Integer shift : worker.canWorkShift) {
+                            if (staffSchedule.spaceInShift[day-1][shift] > 0){
+                                System.out.println(" ******** Ovaj radnik je potreban ovdje i mogu ga staviti da radi");
+                            }
+                        }
+                    }
+                    daysOff = 0;
+                }
+            }
+         //   System.exit(-1);
+        }
+    }
+    
+    public void balanceDayShifts( StaffSchedule staffSchedule, Instance instance ) { 
         
         for(WorkerSchedule workerSchedule : staffSchedule.workerSchedules){
  
@@ -30,9 +84,9 @@ public class Corrections {
                     if (staffSchedule.spaceInShift[day][shift] <= 0) { continue; }
 // ima smjena u koju mogu dodati
              // ako je nova smjena manja od trenutne smjene
-                    if ( (day == 0 || workerSchedule.schedule[day -1 ] <= shift) &&
-                            (    day == (workerSchedule.schedule.length - 1)
-                            || workerSchedule.schedule[day + 1 ] >= shift)
+                    if ( (day == 0 || workerSchedule.schedule[day -1] == -1 || workerSchedule.schedule[day -1 ] <= shift) 
+                            && 
+                            (day == (workerSchedule.schedule.length - 1) || workerSchedule.schedule[day +1] == -1 || workerSchedule.schedule[day + 1 ] >= shift)
                         ){ 
                    //         System.out.println("New shift " + shift + " mjesta " + staffSchedule.spaceInShift[day][shift]);
                    //         System.out.println("Old shift " + workerSchedule.schedule[day] + " mjesta " + staffSchedule.spaceInShift[day][workerSchedule.schedule[day]]);         
@@ -53,6 +107,5 @@ public class Corrections {
             workerSchedule.calculateFitness(worker, instance.numberOfDays);
          //   System.exit(-1);
         }
-        staffSchedule.calculateShiftCover(instance.shiftCover);
     }
 }

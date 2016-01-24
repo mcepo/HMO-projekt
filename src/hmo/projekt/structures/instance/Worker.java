@@ -44,8 +44,6 @@ public class Worker {
     public List<Integer> spreadDaysOn = new LinkedList<>();
     public List<Integer> spreadDaysOff = new LinkedList<>();
     
-     
-
     public Worker(String line, HashMap<String, Integer> staffMap, List<Worker> staff, List<Shift> shifts, int numberOfShiftsPerDay) {
         
         this.daysOff = new HashSet<>();
