@@ -55,7 +55,7 @@ public class Algorithm {
         for(int i = 0; i< this.POPULATION_SIZE;i++){
             this.population.add( this.generator.generateStaffSchedule() );
         }
-        this.population = this.population.subList(0 ,(int)(this.NUMBER_OF_PARENTS) );
+        this.population.subList(this.NUMBER_OF_PARENTS, this.POPULATION_SIZE);
         Collections.sort(this.population);
 
 //        System.out.println("Total result: " + this.population.get(0).fitness + 
@@ -74,7 +74,7 @@ public class Algorithm {
         while (!this.isSatisfying(population)){
             parent_1 = 0;
             parent_2 = 0;
-            for(int i = this.NUMBER_OF_PARENTS; i < this.POPULATION_SIZE -1 ; i++){
+            for(int i = this.NUMBER_OF_PARENTS; i < this.POPULATION_SIZE ; i++){
                 
                 while (parent_1 == parent_2) {
                     parent_1 = (int) (Math.random()*this.NUMBER_OF_PARENTS);
@@ -91,7 +91,7 @@ public class Algorithm {
                 population.add(offspring);
             }
             Collections.sort(population);
-            population = population.subList(0, this.NUMBER_OF_PARENTS);
+            population.subList(this.NUMBER_OF_PARENTS, this.POPULATION_SIZE).clear();
         }
     }
     
