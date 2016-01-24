@@ -18,18 +18,14 @@ public class WorkerSchedule {
 // pretpostavljam da će mi trebati kod zamjena dana
     public int maxWeekends;
     
-    public int daysToMaxDay;
-    public int daysToMinDay;
-    
-    public int leftoverWorkDays ;
+    public int daysOn;
 
-    public WorkerSchedule(int[] schedule, int workerId, int maxWeekends, int daysToMaxDay, int daysToMinDay) {
+    public WorkerSchedule(int[] schedule, int workerId, int maxWeekends, int daysOn) {
         
         this.schedule = schedule;
         this.workerId = workerId;
         this.maxWeekends = maxWeekends;
-        this.daysToMinDay = daysToMinDay;
-        this.daysToMaxDay = daysToMaxDay;
+        this.daysOn = daysOn;
     }
 
     public WorkerSchedule(WorkerSchedule workerSchedule) {
@@ -37,8 +33,7 @@ public class WorkerSchedule {
         this.schedule = workerSchedule.schedule;
         this.workerId = workerSchedule.workerId;
         this.maxWeekends = workerSchedule.maxWeekends;
-        this.daysToMinDay = workerSchedule.daysToMinDay;
-        this.daysToMaxDay = workerSchedule.daysToMaxDay;
+        this.daysOn = workerSchedule.daysOn;
         this.fitness = workerSchedule.fitness;
         
     }

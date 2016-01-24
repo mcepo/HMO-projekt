@@ -1,6 +1,7 @@
 package hmo.projekt.structures.schedule;
 
 import hmo.projekt.Instance;
+import java.util.Arrays;
 
 /**
  *
@@ -64,7 +65,7 @@ public class StaffSchedule  implements Comparable<StaffSchedule>{
         for(int day = 0;day < spaceInShift.length;day ++) {
             System.arraycopy(shiftCover[day], 0, this.spaceInShift[day], 0, shiftCover[day].length);
         }
-
+        
         for(WorkerSchedule workerSchedule : this.workerSchedules) {
             for(int day = 0; day < workerSchedule.schedule.length; day ++) {
                 

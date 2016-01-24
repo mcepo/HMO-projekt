@@ -72,8 +72,7 @@ public class PopulationGenerator {
         List<Integer> allowedShiftsInNextDay = new ArrayList<>(worker.canWorkShift);
         
         while (day < this.instance.numberOfDays && workDays <= worker.maxShifts ) {
-            
-            
+
             if (worker.daysOff.contains(day) == true ) { 
                 ++ day;
                 consecutiveDaysOn = (int)(Math.random() * (worker.maxConsecutiveShifts - worker.minConsecutiveShifts + 1 ) + worker.minConsecutiveShifts);
@@ -113,6 +112,7 @@ public class PopulationGenerator {
             }
             shift = allowedShiftsInNextDay.get((int)(Math.random() * allowedShiftsInNextDay.size())); 
             schedule[day] = shift;
+            
             workDays ++;
 
             if ( this.instance.weekendShiftsSaturday.contains(day) || 
@@ -180,8 +180,7 @@ public class PopulationGenerator {
             return new WorkerSchedule(  schedule, 
                                         workerId, 
                                         maxWeekends, 
-                                        (  worker.maxShifts - workDays ),
-                                        ( workDays - worker.minShifts) );
+                                        workDays);
         } else {
             return null;
         }
