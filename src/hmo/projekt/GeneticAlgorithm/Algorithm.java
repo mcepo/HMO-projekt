@@ -16,9 +16,13 @@ import java.util.List;
 
 public class Algorithm {
     
+    
+    // ukupana veličina populacije sa potomcima 
     private final int POPULATION_SIZE = 100;
+    // koliki postotak ukupne populacije će se križati, ostatak će biti odbačen
     private final double SURVIVALE_RATE = 0.1;
     private final int OPTIMAL_SOLUTION  = 0;
+    // maksimalan broj iteracija bez poboljšanja
     private final int MAX_ITERATIONS = 300;
     
     private final int NUMBER_OF_PARENTS;
