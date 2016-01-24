@@ -16,9 +16,12 @@ import java.util.List;
 
 public class Algorithm {
     
-    private final int POPULATION_SIZE = 30;
+    private final int POPULATION_SIZE = 100;
+    private final double SURVIVALE_RATE = 0.1;
     private final int OPTIMAL_SOLUTION  = 0;
-    private final int MAX_ITERATIONS = 200;
+    private final int MAX_ITERATIONS = 300;
+    
+    private final int NUMBER_OF_PARENTS;
     
     private int bestFitness;
     private int iteration;
@@ -41,13 +44,14 @@ public class Algorithm {
         this.crossover = new Crossover();
         this.mutate = new Mutate();
         this.corrections = new Corrections();
+        this.NUMBER_OF_PARENTS = (int)(this.POPULATION_SIZE * this.SURVIVALE_RATE);
         
         System.out.println("Generiram inicijalnu populaciju");
             
         for(int i = 0; i< this.POPULATION_SIZE;i++){
             this.population.add( this.generator.generateStaffSchedule() );
         }
-        this.population = this.population.subList(0 ,this.POPULATION_SIZE );
+        this.population = this.population.subList(0 ,(int)(this.NUMBER_OF_PARENTS) );
         Collections.sort(this.population);
 
 //        System.out.println("Total result: " + this.population.get(0).fitness + 
@@ -61,13 +65,21 @@ public class Algorithm {
     
     public void start () {
         
+        int parent_1, parent_2;
+        
         while (!this.isSatisfying(population)){
-            for(int i = 0; i < this.POPULATION_SIZE -1 ; i++){
+            parent_1 = 0;
+            parent_2 = 0;
+            for(int i = this.NUMBER_OF_PARENTS; i < this.POPULATION_SIZE -1 ; i++){
                 
-                StaffSchedule offspring = new StaffSchedule(this.instance); 
-
+                while (parent_1 == parent_2) {
+                    parent_1 = (int) (Math.random()*this.NUMBER_OF_PARENTS);
+                    parent_2 = (int) (Math.random()*this.NUMBER_OF_PARENTS);
+                }
                 
-                this.crossover.apply(population.get(i), population.get(i + 1), this.instance, offspring);
+                StaffSchedule offspring = new StaffSchedule(this.instance);
+                
+                this.crossover.apply(population.get(parent_1), population.get(parent_2), this.instance, offspring);
                 this.mutate.apply(offspring, generator, this.instance); 
                 offspring.calculateShiftCover(this.instance.shiftCover);
                 this.corrections.balanceDayShifts(offspring, instance);
@@ -75,7 +87,7 @@ public class Algorithm {
                 population.add(offspring);
             }
             Collections.sort(population);
-            population = population.subList(0, this.POPULATION_SIZE);
+            population = population.subList(0, this.NUMBER_OF_PARENTS);
         }
     }
     

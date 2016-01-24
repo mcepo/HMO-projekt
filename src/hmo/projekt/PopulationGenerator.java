@@ -157,33 +157,32 @@ public class PopulationGenerator {
         }
         
 // provjera valjanosti rješenja, treba to promjeniti
-//        int daysOn = 0;
-//        int daysOff = 0;
-//        
-//        for(day = 0 ;day < this.instance.numberOfDays;day++){
-//            if (schedule[day] == -1){
-//                daysOff ++;
-//                if ((daysOn > 0 && daysOn < worker.minConsecutiveShifts) || daysOn > worker.maxConsecutiveShifts){
-//                    return null;
-//                }
-//                    daysOn = 0;
-//            } else {
-//                daysOn ++;
-//                if (daysOff > 0 && daysOff < worker.minConsecutiveDaysOff){
-//                    return null;
-//                }
-//                daysOff = 0;
-//            }
-//        }
+        int daysOn = 0;
+        int daysOff = 0;
+        
+        for(day = 0 ;day < this.instance.numberOfDays;day++){
+            if (schedule[day] == -1){
+                daysOff ++;
+                if ((daysOn > 0 && daysOn < worker.minConsecutiveShifts) || daysOn > worker.maxConsecutiveShifts){
+                    return null;
+                }
+                    daysOn = 0;
+            } else {
+                daysOn ++;
+                if (daysOff > 0 && daysOff < worker.minConsecutiveDaysOff){
+                    return null;
+                }
+                daysOff = 0;
+            }
+        }
 
-     //   if ((worker.maxShifts >= workDays) && (workDays > worker.minShifts) && maxWeekends >= 0) {
-       if (Algorithm.isFeasible(schedule, instance, workerId)) {    
+        if ((worker.maxShifts >= workDays) && (workDays > worker.minShifts) && maxWeekends >= 0) {
+    //   if (Algorithm.isFeasible(schedule, instance, workerId)) {    
             return new WorkerSchedule(  schedule, 
                                         workerId, 
                                         maxWeekends, 
                                         workDays);
         } else {
-           System.out.println("Raspored radnika nije valjan");
             return null;
         }
     }
