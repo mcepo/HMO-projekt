@@ -3,6 +3,7 @@ package hmo.projekt.GeneticAlgorithm;
 import hmo.projekt.Instance;
 import hmo.projekt.PopulationGenerator;
 import hmo.projekt.PrettyPrint;
+import hmo.projekt.structures.instance.Worker;
 import hmo.projekt.structures.schedule.StaffSchedule;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -109,6 +110,115 @@ public class Algorithm {
     }
     
     public static boolean isFeasible (StaffSchedule staffSchedule, Instance instance) {
+	// provjera jedne smjene dnevno nije potrebna, jer struktura ne dozvoljava vise od jedne?	
+		
+	// iteriraj po workerSchedules (odnosno po radnicima)
+		for (int ss = 0; ss < staffSchedule.workerSchedules.length; ss ++) {
+		// trenutni radnik
+			Worker worker = instance.staff.get(instance.staffMap.get(staffSchedule.workerSchedules[ss].workerId));
+		
+		// broj radnih vikenda za trenutnog radnika
+			int workingWeekends = 0;
+			
+		// pronadi ukupno vrijeme rada za tog radnika
+			int totalMinutes = 0;
+		
+		// broj uzastopnih smjena
+			int consecutiveShifts = 0;
+		
+		// broj uzastopnih dana odmora
+			int consecutiveDaysOff = 0;
+		
+		// iteriraj po workerSchedules.schedule (po danima), svaka iteracija je jedan dan
+		// odnosno smjena koju je radnik odradio taj dan
+			for (int day = 0; day < staffSchedule.workerSchedules[ss].schedule.length; day ++) {
+				int currentShift = staffSchedule.workerSchedules[ss].schedule[day]; // trenutna smjena
+			
+			// ako nije rijec o zadnjem danu, provjeri da li je slijedeca smjena dozvoljena
+				if (day != (staffSchedule.workerSchedules[ss].schedule.length - 1))
+				{
+					int followingShift = staffSchedule.workerSchedules[ss].schedule[day+1]; // slijedeca smjena (iduci dan)
+					
+					// ako radnik nije radio taj ili slijedeci dan, nije potrebna provjera
+						if (currentShift != -1 && followingShift != -1)
+						{
+						// provjeri da li se slijedeca smjena nalazi u listi smjena koje ne smiju slijediti trenutnoj smjeni
+							if (instance.shifts.get(currentShift).cantFollowShift.contains(followingShift))
+								return false;
+						}
+				}
+				
+			// radnik nije radio taj dan
+				if(currentShift == -1) {
+				// Pribroji uzastopnim danima odmora
+					consecutiveDaysOff++;
+					
+				// ako se dogodio prijelaz iz smjene u odmor
+					if (consecutiveShifts > 0)
+					{
+					// provjeri je li imao broj smjena manji od minimalnog ili veci od maksimalnog
+						if (consecutiveShifts < worker.minConsecutiveShifts || consecutiveShifts > worker.maxConsecutiveShifts)
+							return false;
+						
+					// ponisti trenutni broj uzastopnih smjena
+						consecutiveShifts = 0;
+					}	
+				}
+				
+			// radnik je radio taj dan
+				else {			
+				// ako je taj dan radio neku smjenu, pribroji njeno trajanje
+					totalMinutes += instance.shifts.get(currentShift).lengthMinutes;
+					
+				// provjeri je li ukupno vrijeme premasilo maksimum
+					if (totalMinutes > worker.maxTotalMinutes)
+						return false;
+
+				// provjeri da li se trenutna smjena nalazi u listi smjena koje taj radnik smije raditi
+					if (!worker.canWorkShift.contains(currentShift))
+						return false;
+
+				// provjeri da li se trenutni dan nalazi u listi slobodnih dana
+					if(worker.daysOff.contains(day))
+						return false;
+
+				// provjeri je li ovaj dan vikend
+					if (instance.weekendShiftsSaturday.contains(day) || instance.weekendShiftsSunday.contains(day)) {
+						workingWeekends++;
+
+					// provjeri je li radnik premasio maksimalni broj radnih vikenda
+						if (workingWeekends > worker.maxWeekends)
+							return false;
+					}
+					
+				// pribroji uzastopnim smjenama
+					consecutiveShifts++;
+					
+				// ako se dogodio prijelaz iz odmora u smjenu
+					if (consecutiveDaysOff > 0)
+					{
+					// provjeri je li imao dovoljno dana odmora, ako nije, rjesenje nije feasible
+						if (consecutiveDaysOff < worker.minConsecutiveDaysOff)
+							return false;
+						
+					// ponisti trenutni broj uzastopnih dana odmora
+						consecutiveDaysOff = 0;
+					}
+				}
+			}
+			
+		// provjeri je li ukupno vrijeme manje od minimalnog vremena
+			if (totalMinutes < worker.minTotalMinutes)
+				return false;
+			
+		// zadnji slijed uzastopnih smjena/dana odmora je ostao neprovjeren
+			if (consecutiveShifts > 0 && (consecutiveShifts < worker.minConsecutiveShifts || consecutiveShifts > worker.maxConsecutiveShifts))
+				return false;
+
+			if (consecutiveDaysOff > 0 && (consecutiveDaysOff < worker.minConsecutiveDaysOff))
+				return false;
+		}
+		
         return true;
     }
 }
