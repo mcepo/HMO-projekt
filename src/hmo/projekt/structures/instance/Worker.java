@@ -80,7 +80,7 @@ public class Worker {
         this.maxWeekends = Integer.parseInt(piece[7]);
         
         this.maxShifts = (int)(this.maxTotalMinutes/shifts.get(0).lengthMinutes);
-        this.minShifts = (int) Math.ceil(this.minTotalMinutes/shifts.get(0).lengthMinutes);
+        this.minShifts = (int) Math.ceil((double)this.minTotalMinutes/(double)shifts.get(0).lengthMinutes);
     }
     
     public void setDaysOff (String[] pieces, int numberOfDays ) {

@@ -35,10 +35,10 @@ public class PopulationGenerator {
             workerSchedule.calculateFitness(this.instance.staff.get(workerId), this.instance.numberOfDays);
             this.staffSchedule.workerSchedules[workerId] = workerSchedule;
         }
-        this.staffSchedule.calculateShiftCover(instance.shiftCover);
-     //   this.corrections.removeWorkers(staffSchedule, instance);
-        this.corrections.balanceDayShifts(this.staffSchedule, instance);
-        this.staffSchedule.calculateShiftCover(instance.shiftCover);
+    //    this.staffSchedule.calculateShiftCover(instance.shiftCover);
+        this.corrections.apply(staffSchedule, instance);
+       // this.corrections.balanceDayShifts(this.staffSchedule, instance);
+   //     this.staffSchedule.calculateShiftCover(instance.shiftCover);
                 
         this.staffSchedule.calculateFitness(this.instance);
         return staffSchedule;
@@ -176,7 +176,7 @@ public class PopulationGenerator {
             }
         }
 
-        if ((worker.maxShifts >= workload) && (workload > worker.minShifts) && maxWeekends >= 0) {
+        if ((worker.maxShifts >= workload) && (workload >= worker.minShifts) && maxWeekends >= 0) {
      
         
         // SAMO GORNJU LINIJU ZAKOMENTRAJ I DOLJNJU LINIJU ODKOMENTIRAJ

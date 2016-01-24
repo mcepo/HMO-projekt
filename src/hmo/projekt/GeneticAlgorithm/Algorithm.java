@@ -23,7 +23,7 @@ public class Algorithm {
     private final double SURVIVALE_RATE = 0.7;
     private final int OPTIMAL_SOLUTION  = 0;
     // maksimalan broj iteracija bez poboljšanja
-    private final int MAX_ITERATIONS = 1000;
+    private final int MAX_ITERATIONS = 100;
     
     private final int NUMBER_OF_PARENTS;
     
@@ -123,9 +123,10 @@ public class Algorithm {
                 
                 this.crossover.apply(population.get(parent_1), population.get(parent_2), this.instance, offspring);
                 this.mutate.apply(offspring, generator, this.instance); 
-                offspring.calculateShiftCover(this.instance.shiftCover);
-                this.corrections.balanceDayShifts(offspring, instance);
-                offspring.calculateShiftCover(this.instance.shiftCover);
+      //          offspring.calculateShiftCover(this.instance.shiftCover);
+                this.corrections.apply(offspring, instance);
+            //    this.corrections.balanceDayShifts(offspring, instance);
+     //           offspring.calculateShiftCover(this.instance.shiftCover);
                 offspring.calculateFitness(this.instance);
                 population.add(offspring);
                 
