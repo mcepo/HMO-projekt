@@ -23,7 +23,7 @@ public class Algorithm {
     private final double SURVIVALE_RATE = 0.3;
     private final int OPTIMAL_SOLUTION  = 0;
     // maksimalan broj iteracija bez poboljšanja
-    private final int MAX_ITERATIONS = 300;
+    private final int MAX_ITERATIONS = 1000;
     
     private final int NUMBER_OF_PARENTS;
     
@@ -63,11 +63,9 @@ public class Algorithm {
 //                " Shift result: " + this.population.get(0).shiftFitness
 //        );
 //        PrettyPrint.scheduleToFile(population.get(0), instance);
-        
-        this.start();
     }
     
-    public void start () {
+    public void solve () {
         
         int parent_1, parent_2;
         
