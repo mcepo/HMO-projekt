@@ -72,9 +72,7 @@ public class Algorithm {
                 offspring.calculateShiftCover(this.instance.shiftCover);
                 this.corrections.balanceDayShifts(offspring, instance);
                 offspring.calculateFitness(this.instance);
-                if (Algorithm.isFeasible(offspring, instance)) {
-                    population.add(offspring);
-                }
+                population.add(offspring);
             }
             Collections.sort(population);
             population = population.subList(0, this.POPULATION_SIZE);
@@ -109,13 +107,11 @@ public class Algorithm {
         return (bestFitness <= OPTIMAL_SOLUTION || this.iteration == 0 ) ;
     }
     
-    public static boolean isFeasible (StaffSchedule staffSchedule, Instance instance) {
-	// provjera jedne smjene dnevno nije potrebna, jer struktura ne dozvoljava vise od jedne?	
-		
-	// iteriraj po workerSchedules (odnosno po radnicima)
-		for (int ss = 0; ss < staffSchedule.workerSchedules.length; ss ++) {
+    public static boolean isFeasible (int[] schedule, Instance instance, int workerId) {
+	// provjera jedne smjene dnevno nije potrebna, jer struktura ne dozvoljava vise od jedne? DA	
+
 		// trenutni radnik
-			Worker worker = instance.staff.get(instance.staffMap.get(staffSchedule.workerSchedules[ss].workerId));
+			Worker worker = instance.staff.get(workerId);
 		
 		// broj radnih vikenda za trenutnog radnika
 			int workingWeekends = 0;
@@ -131,13 +127,13 @@ public class Algorithm {
 		
 		// iteriraj po workerSchedules.schedule (po danima), svaka iteracija je jedan dan
 		// odnosno smjena koju je radnik odradio taj dan
-			for (int day = 0; day < staffSchedule.workerSchedules[ss].schedule.length; day ++) {
-				int currentShift = staffSchedule.workerSchedules[ss].schedule[day]; // trenutna smjena
+			for (int day = 0; day < schedule.length; day ++) {
+				int currentShift = schedule[day]; // trenutna smjena
 			
 			// ako nije rijec o zadnjem danu, provjeri da li je slijedeca smjena dozvoljena
-				if (day != (staffSchedule.workerSchedules[ss].schedule.length - 1))
+				if (day != (schedule.length - 1))
 				{
-					int followingShift = staffSchedule.workerSchedules[ss].schedule[day+1]; // slijedeca smjena (iduci dan)
+					int followingShift = schedule[day+1]; // slijedeca smjena (iduci dan)
 					
 					// ako radnik nije radio taj ili slijedeci dan, nije potrebna provjera
 						if (currentShift != -1 && followingShift != -1)
@@ -217,7 +213,6 @@ public class Algorithm {
 
 			if (consecutiveDaysOff > 0 && (consecutiveDaysOff < worker.minConsecutiveDaysOff))
 				return false;
-		}
 		
         return true;
     }
