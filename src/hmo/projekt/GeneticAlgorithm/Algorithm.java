@@ -120,7 +120,7 @@ public class Algorithm {
     }
     
     public static boolean isFeasible (int[] schedule, Instance instance, int workerId) {
-	// provjera jedne smjene dnevno nije potrebna, jer struktura ne dozvoljava vise od jedne? DA	
+	// provjera jedne smjene dnevno nije potrebna, jer struktura ne dozvoljava vise od jedne	
 
 		// trenutni radnik
 			Worker worker = instance.staff.get(workerId);
@@ -149,9 +149,9 @@ public class Algorithm {
 					
 					// ako radnik nije radio taj ili slijedeci dan, nije potrebna provjera
 						if (currentShift != -1 && followingShift != -1)
-						{
+						{							
 						// provjeri da li se slijedeca smjena nalazi u listi smjena koje ne smiju slijediti trenutnoj smjeni
-							if (instance.shifts.get(currentShift).cantFollowShift.contains(followingShift))
+							if (instance.shifts.get(currentShift).cantFollowShift != null && instance.shifts.get(currentShift).cantFollowShift.contains(followingShift))
 								return false;
 						}
 				}
