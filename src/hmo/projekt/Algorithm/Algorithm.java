@@ -15,15 +15,19 @@ import java.util.List;
 
 public class Algorithm {
     
-    private final int POPULATION_SIZE = 20;
+    private final int POPULATION_SIZE = 30;
     private final int OPTIMAL_SOLUTION  = 0;
-    private final int MAX_ITERATIONS = 100;
+    private final int MAX_ITERATIONS = 200;
     
     private int bestFitness;
     private int iteration;
     
     private final Instance instance;
     public PopulationGenerator generator;
+    
+    public Corrections corrections;
+    public Mutate mutate;
+    public Crossover crossover;
     
     public List<StaffSchedule> population ;
     
@@ -33,6 +37,9 @@ public class Algorithm {
         this.population = new LinkedList<>();
         this.instance = instance;
         this.generator = new PopulationGenerator(this.instance);
+        this.crossover = new Crossover();
+        this.mutate = new Mutate();
+        this.corrections = new Corrections();
         
         System.out.println("Generiram inicijalnu populaciju");
             
@@ -56,12 +63,17 @@ public class Algorithm {
         while (!this.isSatisfying(population)){
             for(int i = 0; i < this.POPULATION_SIZE -1 ; i++){
                 
-                StaffSchedule offspring = Crossover.apply(population.get(i), population.get(i + 1), instance);
-                Mutate.apply(offspring, generator, instance); 
-                offspring.calculateShiftCover(instance.shiftCover);
-                Corrections.balanceDayShifts(offspring, instance);
-                offspring.calculateFitness(this.instance.weightForShiftCoverUnder, this.instance.weightForShiftCoverOver);
-                population.add(offspring);
+                StaffSchedule offspring = new StaffSchedule(this.instance); 
+
+                
+                this.crossover.apply(population.get(i), population.get(i + 1), this.instance, offspring);
+                this.mutate.apply(offspring, generator, this.instance); 
+                offspring.calculateShiftCover(this.instance.shiftCover);
+        //        this.corrections.balanceDayShifts(offspring, instance);
+                offspring.calculateFitness(this.instance);
+                if (Algorithm.isFeasible(offspring, instance)) {
+                    population.add(offspring);
+                }
             }
             Collections.sort(population);
             population = population.subList(0, this.POPULATION_SIZE);
@@ -78,6 +90,7 @@ public class Algorithm {
     private boolean isSatisfying(List<StaffSchedule> population) {
         if (bestFitness > this.population.get(0).fitness) {
             this.dumpPopulationFitness(10);
+            
             System.out.println(" ******* Zapisujem rasporede u datoteke *******");
             for(int index = 1; index < 11 ; index ++) {
                 PrettyPrint.scheduleToFile(population.get(index-1), instance, "res-"+index+"-cepo.txt");
@@ -93,5 +106,9 @@ public class Algorithm {
                 " Iteration: " + this.iteration);
     //    this.dumpPopulationFitness();
         return (bestFitness <= OPTIMAL_SOLUTION || this.iteration == 0 ) ;
+    }
+    
+    public static boolean isFeasible (StaffSchedule staffSchedule, Instance instance) {
+        return true;
     }
 }
