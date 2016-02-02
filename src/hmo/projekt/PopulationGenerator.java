@@ -35,12 +35,8 @@ public class PopulationGenerator {
             workerSchedule.calculateFitness(this.instance.staff.get(workerId), this.instance.numberOfDays);
             this.staffSchedule.workerSchedules[workerId] = workerSchedule;
         }
-    //    this.staffSchedule.calculateShiftCover(instance.shiftCover);
         this.corrections.apply(staffSchedule, instance);
-       // this.corrections.balanceDayShifts(this.staffSchedule, instance);
-   //     this.staffSchedule.calculateShiftCover(instance.shiftCover);
-                
-        this.staffSchedule.calculateFitness(this.instance);
+        
         return staffSchedule;
     }
     
@@ -54,8 +50,7 @@ public class PopulationGenerator {
             schedule[i] = -1;
         }
         
-        int workload = 0;
-        int day = 0;
+        int day;
         
         if (Math.random() > 0.5 ){
             day = 0 ;
@@ -67,12 +62,12 @@ public class PopulationGenerator {
         }
         int shift ;
         int index;
-        int maxWeekends = worker.maxWeekends;
         int dayOff = day;
+        int workload = 0;
         
         List<Integer> allowedShiftsInNextDay = new ArrayList<>(worker.canWorkShift);
         
-        while (day < this.instance.numberOfDays && workload <= worker.maxShifts ) {
+        while (day < this.instance.numberOfDays && workload <= worker.maxShifts) {
 
             if (worker.daysOff.contains(day) == true ) { 
                 ++ day;
@@ -92,10 +87,12 @@ public class PopulationGenerator {
                 index = (int)(Math.random() * worker.spreadDaysOn.size());
                 consecutiveDaysOn = worker.spreadDaysOn.get(index);
                 consecutiveDaysOff = worker.spreadDaysOff.get(index);
-                if (Math.random() > ((worker.minShifts + (worker.minShifts*0.20)) / worker.daysOff.size()) ) {
-                    consecutiveDaysOn -= 1;
+                if (Math.random() > ((double)(worker.maxShifts*1.5)/instance.numberOfDays )) {
+                    if (consecutiveDaysOn-1 < worker.minConsecutiveShifts) {
+                        consecutiveDaysOn -= 1;
+                    }
                 }
-                if (Math.random() > ((worker.minShifts + (worker.minShifts*0.20)) / worker.daysOff.size()) ) {
+                if (Math.random() > ((double)(worker.minShifts*1.5)/instance.numberOfDays) ) {
                     consecutiveDaysOff += 1;
                 }
                 allowedShiftsInNextDay = new ArrayList<>(worker.canWorkShift);
@@ -113,17 +110,8 @@ public class PopulationGenerator {
             }
             shift = allowedShiftsInNextDay.get((int)(Math.random() * allowedShiftsInNextDay.size())); 
             schedule[day] = shift;
-            
-            workload ++;
+            workload ++ ;
 
-            if ( this.instance.weekendShiftsSaturday.contains(day) || 
-                 ( this.instance.weekendShiftsSunday.contains(day) &&  schedule[day-1] == -1)) {
-                if (maxWeekends == 0) {
-                    return null ;
-                } else {
-                   -- maxWeekends ;                        
-                }
-            }
             if (this.instance.shifts.get(shift).cantFollowShift != null) {
                 for(index = 0; index < allowedShiftsInNextDay.size(); index ++) {
                     if (this.instance.shifts.get(shift).cantFollowShift.contains(allowedShiftsInNextDay.get(index))) {
@@ -149,59 +137,142 @@ public class PopulationGenerator {
                 if (consecutiveDaysOn < worker.minConsecutiveShifts) {
                     for (;consecutiveDaysOn != 0; consecutiveDaysOn --) {
                         schedule[day - consecutiveDaysOn] = -1;
-                        -- workload;
                     }
                 }
                 consecutiveDaysOn = 0;
             }
         }
+
+        return this.workerScheduleIsFeasible(schedule, instance, workerId);
+    }
+    
         
-// provjera valjanosti rješenja, treba to promjeniti
-        int daysOn = 0;
-        int daysOff = 0;
+    public WorkerSchedule workerScheduleIsFeasible (int[] schedule, Instance instance, int workerId) {
+	// provjera jedne smjene dnevno nije potrebna, jer struktura ne dozvoljava vise od jedne
         
-        for(day = 0 ;day < this.instance.numberOfDays;day++){
-            if (schedule[day] == -1){
-                daysOff ++;
-                if ((daysOn > 0 && daysOn < worker.minConsecutiveShifts) || daysOn > worker.maxConsecutiveShifts){
-                    return null;
+// trenutni radnik
+        Worker worker = instance.staff.get(workerId);
+
+// pronadi ukupno vrijeme rada za tog radnika
+        int workload = 0;
+        int numberOfWorkWeekends = 0;
+        
+        boolean weekend = false;
+        
+        String errorMsg = "";
+        
+        WorkerSchedule workerSchedule = null;
+        
+        int day, daysOn, daysOff;
+
+// iteriraj po workerSchedules.schedule (po danima), svaka iteracija je jedan dan
+// odnosno smjena koju je radnik odradio taj dan
+        for (day = 0, daysOn = 0, daysOff = 0; day < schedule.length; day ++) {
+            
+    // kad pročitaš ne radni dan
+            if(schedule[day] == -1 ){ // neradni dan
+                
+        // provjeri dali je imao adekvatan broj uzastopnih radnih dana
+                if (    daysOn != 0 
+                     && daysOn > worker.maxConsecutiveShifts 
+                     && daysOn < worker.minConsecutiveShifts
+                    ) {
+                    // nema adekvatan broj uzastopnih dana
+                    errorMsg = " uzastopni radni dani izvan ograničenja: " +
+                                worker.maxConsecutiveShifts +
+                                " > " +
+                                daysOn +
+                                " > " +
+                                worker.minConsecutiveShifts +
+                                "\n\t";
+                    break;
                 }
-                    daysOn = 0;
-            } else {
-                daysOn ++;
-                if (daysOff > 0 && daysOff < worker.minConsecutiveDaysOff){
-                    return null;
+                
+                daysOff++;
+                daysOn = 0;
+                weekend = false;
+                
+            } else { // radni dan
+                
+        // provjeri dali je imao adekvatan broj uzastopnih slobodnih dana        
+                if (    daysOff != 0 
+                     && daysOff < worker.minConsecutiveDaysOff
+                    ) {
+                // radnik ne može raditi u dodjeljenoj smjeni
+                    errorMsg = " premalo uzastopnih slobodnih dana: " +
+                                daysOff +
+                                " > " +
+                                worker.minConsecutiveDaysOff + 
+                                "\n\t";
+                    break;
                 }
+                             
+        // provjeri dali je vikend i pribroji vikend u radne vikende
+                if ( instance.weekendShiftsSaturday.contains(day) == true ) {
+                    weekend = true;
+                    numberOfWorkWeekends ++;
+                }
+                
+                if (instance.weekendShiftsSunday.contains(day) == true && weekend == false) {
+                    numberOfWorkWeekends ++;
+                }
+                
+                                
+                if (worker.canWorkShift.contains(schedule[day]) == false) {
+                       // radnik ne može raditi u dodjeljenoj smjeni
+                    errorMsg = " radniku dodjeljena zabranjena smjena: " +
+                                schedule[day] +
+                                " dozvoljene smjene: " +
+                                worker.canWorkShift +
+                                "\n\t";
+                    break;
+                }
+
+                daysOn++;
+                workload++;
                 daysOff = 0;
             }
         }
-
-        if ((worker.maxShifts >= workload) && (workload >= worker.minShifts) && maxWeekends >= 0) {
-     
         
-        // SAMO GORNJU LINIJU ZAKOMENTRAJ I DOLJNJU LINIJU ODKOMENTIRAJ
-     //   if (Algorithm.isFeasible(schedule, instance, workerId)) {    
-            return new WorkerSchedule(  schedule, 
-                                        workerId, 
-                                        maxWeekends, 
-                                        workload);
-        } else {
-            return null;
+        
+     // provjeri jel ima previše vikenda u rasporedu        
+        if (numberOfWorkWeekends > worker.maxWorkWeekends) {
+            errorMsg += " previše vikenda " + 
+                         worker.maxWorkWeekends +
+                       " >= " +
+                         numberOfWorkWeekends + 
+                        "\n\t";
         }
-    }
-    
-    private void dumpGeneratedWorkerSchedule (Worker worker, int maxWeekends, int workDays) {
-        System.out.println(
-                worker.id + 
-                " { " + 
-                worker.maxShifts + 
-                " > " + 
-                workDays+ 
-                " > " + 
-                worker.minShifts+
-                " | weekends " +
-                maxWeekends +
-                "}"
-        );
+     // provjeri jel ima previše radnih dana u rasporedu   
+        if ( worker.minShifts > workload || workload > worker.maxShifts ) {
+            errorMsg += " uzastopni radni dani izvan ograničenja: " +
+                        worker.maxShifts +
+                        " > " +
+                        workload +
+                        " > " +
+                        worker.minShifts;
+        }
+        
+        if (errorMsg.equals("")) {
+            // sve je uredu
+            workerSchedule = new WorkerSchedule(schedule, workerId, numberOfWorkWeekends, workload);
+//            System.out.println(
+//                worker.id + 
+//                " { " + 
+//                worker.maxShifts + 
+//                " > " + 
+//                workload+ 
+//                " > " + 
+//                worker.minShifts+
+//                " | weekends " +
+//                numberOfWorkWeekends +
+//                "} - OK"
+//            );
+        } else {
+            // ispiši grešku
+        //    PrettyPrint.workerSchedule(schedule, instance, workerId);;
+      //     System.out.println(worker.id + " - " + day + " - " + errorMsg);
+        }
+        return workerSchedule;                
     }
 }

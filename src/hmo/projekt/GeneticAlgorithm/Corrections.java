@@ -1,7 +1,6 @@
 package hmo.projekt.GeneticAlgorithm;
 
 import hmo.projekt.Instance;
-import hmo.projekt.PrettyPrint;
 import hmo.projekt.structures.instance.Worker;
 import hmo.projekt.structures.schedule.StaffSchedule;
 import hmo.projekt.structures.schedule.WorkerSchedule;
@@ -14,45 +13,19 @@ public class Corrections {
     
     
     public void apply (StaffSchedule staffSchedule, Instance instance) {
-        
-        // NIJE IŠLO
-//        staffSchedule.calculateShiftCover(instance.shiftCover);
 //        
+        staffSchedule.calculateShiftCover(instance.shiftCover);
+        
 //        for(WorkerSchedule workerSchedule : staffSchedule.workerSchedules){
-//            
+//
 //            while( this.balanceWorker(   workerSchedule, 
 //                                        instance, 
 //                                        instance.staff.get(workerSchedule.workerId),
 //                                        staffSchedule.spaceInShift
 //                                    ) == true 
 //            ) {
-                
-                
 //                workerSchedule.calculateFitness(instance.staff.get(workerSchedule.workerId), 
-//                                                instance.numberOfDays);
-//                int test = 0;
-//                for (int i = 0;i< workerSchedule.schedule.length;i++){
-//                    if (workerSchedule.schedule[i] != -1){
-//                        test ++;
-//                    }
-//                }
-//                if (test != workerSchedule.workload) {
-//                    PrettyPrint.workerSchedule(workerSchedule.schedule, instance, workerSchedule.workerId);
-//                                
-//            System.out.println(
-//                instance.staff.get(workerSchedule.workerId).id + 
-//                " { " + 
-//                instance.staff.get(workerSchedule.workerId).maxShifts + 
-//                " > " + 
-//                workerSchedule.workload + 
-//                 " ( " + test + " ) " +       
-//                " > " + 
-//                instance.staff.get(workerSchedule.workerId).minShifts+
-//                "}"
-//                );
-//            System.exit(-1);
-//                }
-//                
+//                                                instance.numberOfDays); 
 //            }
 //        }
         staffSchedule.calculateShiftCover(instance.shiftCover);
@@ -60,137 +33,24 @@ public class Corrections {
         this.balanceDayShifts(staffSchedule, instance);
         
         staffSchedule.calculateShiftCover(instance.shiftCover);
+        staffSchedule.calculateFitness(instance);
     }
     
     public boolean balanceWorker (WorkerSchedule workerSchedule, Instance instance, Worker worker, int[][] spaceInShift) {
         
-        int daysOff = 0;
-        int daysOn = 0;
-        
-        boolean hadChanges = false ;
-        
-    //    PrettyPrint.workerSchedule(workerSchedule.schedule, instance, workerSchedule.workerId);
-            
-            for(int day = 1; day < workerSchedule.schedule.length; day ++ ) {
-                
-                if (workerSchedule.schedule[day] == -1 ){
- // neradan dan
-                    daysOff ++;
-             // pokušaj prethodni dan pretvoriti u neradni 
-                            // provjeri dali je prethodni dan neradni
-                    if (       workerSchedule.schedule[day -1] != -1  
-                            // jel odrađen dovoljan broj smjena
-                            && daysOn >  worker.minConsecutiveShifts 
-                            // jel imam još dana za dodjeliti tom čovjeku
-                            &&  workerSchedule.workload > worker.minShifts
-                            // dali ima viška u prethodnoj smjeni
-                            &&  spaceInShift[day-1][workerSchedule.schedule[day-1]] < 0
-                            ) {
-                    //    System.out.println("MAKNUO NA DAN " + (day-1));
-                        // povećaj mjesta u tom danu
-                        spaceInShift[day-1][workerSchedule.schedule[day-1]] ++; 
-                        // makni čovjeka iz toga dana
-                        workerSchedule.schedule[day-1] = -1;
-                        // smanji mu workload, manje dana radi
-                        workerSchedule.workload --;
-                        // kod dodavanja za 
-                        if ( instance.weekendShiftsSaturday.contains(day-1) == true ||
-                                (instance.weekendShiftsSunday.contains(day-1) == true 
-                                    && daysOn < 2)){
-                            workerSchedule.maxWeekends ++;
-                        }
-                        
-                        hadChanges = true;
-                    }
-                    
-                    daysOn = 0;
-                }else {
-// radni dan
-                    daysOn++;
-          /// pokušaj prethodni dan pretvoriti u radni          
-                    if (    workerSchedule.schedule[day -1] == -1
-                            && daysOff > worker.minConsecutiveDaysOff 
-                            && workerSchedule.workload < worker.maxShifts 
-                            && (
-                            ( ( instance.weekendShiftsSunday.contains(day-1) == true ||
-                                    (
-                                        instance.weekendShiftsSaturday.contains(day-1) == true 
-                                        && daysOff < 2
-                                    )
-                                )
-                                && workerSchedule.maxWeekends != 0) 
-                                || instance.weekendShiftsSunday.contains(day-1) == false) 
-                            && (
-                                (day + worker.maxConsecutiveShifts) > instance.numberOfDays 
-                                    || (
-                                        (( day + worker.maxConsecutiveShifts) < instance.numberOfDays)
-                                        && workerSchedule.schedule[day + worker.maxConsecutiveShifts -1 ] == -1
-                                        && workerSchedule.schedule[day + (int)worker.maxConsecutiveShifts/2 +1] == -1
-                                )
-                            )
-                            && !worker.daysOff.contains(day-1)
-                        ){
-                        
-                        for(Integer shift : worker.canWorkShift) {
-                            if (spaceInShift[day-1][shift] > 0){
-                     //           System.out.println(" ******** DODAO U DAN " + (day -1));
-                                // povećaj mjesta u tom danu
-                                spaceInShift[day-1][shift] --; 
-                                // makni čovjeka iz toga dana
-                                workerSchedule.schedule[day-1] = shift;
-                                // smanji mu workload, manje dana radi
-                                workerSchedule.workload ++;
-                                
-                                if ( instance.weekendShiftsSunday.contains(day-1) == true ||
-                                (instance.weekendShiftsSaturday.contains(day-1) == true 
-                                    && daysOff < 2)){
-                                    workerSchedule.maxWeekends --;
-                                }
-                                hadChanges = true;
-                            }
-                            break;
-                        }
-                    }
-                    daysOff = 0;
-                }
-            }
+       boolean hadChanged = false;
        
-            // provjera valjanosti rješenja
-            daysOn = 0;
-            daysOff = 0;
-            
-
-            for(int day = 0 ;day < instance.numberOfDays;day++){
-                if (workerSchedule.schedule[day] == -1){
-                    daysOff ++;
-                    if ((daysOn > 0 && daysOn < worker.minConsecutiveShifts) || daysOn > worker.maxConsecutiveShifts){
-                        System.out.println("false consecutiveShifts " + daysOn + " maxShifts " + worker.maxConsecutiveShifts);
-                        PrettyPrint.workerSchedule(workerSchedule.schedule, instance, workerSchedule.workerId);
-                        System.exit(-1);
-                    }
-                        daysOn = 0;
-                } else {
-                    daysOn ++;
-                    if (daysOff > 0 && daysOff < worker.minConsecutiveDaysOff){
-                        System.out.println("false consecutiveDaysOff");
-                        PrettyPrint.workerSchedule(workerSchedule.schedule, instance, workerSchedule.workerId);
-                        System.exit(-1);
-
-                    }
-                    daysOff = 0;
-                }
-            }
-            if ((worker.maxShifts >= workerSchedule.workload) 
-                    && (workerSchedule.workload >= worker.minShifts) 
-                    && workerSchedule.maxWeekends >= 0) {
-         //       System.out.println("OK " + instance.staff.get(workerSchedule.workerId).id);
-                } else {
-                    System.out.println("false " + workerSchedule.workload + " maxWeekends " + workerSchedule.maxWeekends + " allowed weekends " + worker.maxWeekends ) ;
-                    PrettyPrint.workerSchedule(workerSchedule.schedule, instance, workerSchedule.workerId);
-                    System.exit(-1);
-                }
-            
-            return hadChanges;
+       for (int day = 0;day < instance.numberOfDays; day ++) {
+           // TO BE CONTINUED
+           
+           
+       }
+       
+       
+       
+       
+       
+       return hadChanged;
     }
     
     public void balanceDayShifts( StaffSchedule staffSchedule, Instance instance ) { 

@@ -26,7 +26,7 @@ public class Worker {
     // minimalan broj uzastopnih dana koje radnik mora biti slobodan
     public int minConsecutiveDaysOff;
     // maksimalan broj vikenda koje radnik može provesti radeći        
-    public int maxWeekends;
+    public int maxWorkWeekends;
   
     public int minShifts;
     public int maxShifts;
@@ -77,7 +77,7 @@ public class Worker {
         this.maxConsecutiveShifts = Integer.parseInt(piece[4]);
         this.minConsecutiveShifts = Integer.parseInt(piece[5]);
         this.minConsecutiveDaysOff = Integer.parseInt(piece[6]);
-        this.maxWeekends = Integer.parseInt(piece[7]);
+        this.maxWorkWeekends = Integer.parseInt(piece[7]);
         
         this.maxShifts = (int)(this.maxTotalMinutes/shifts.get(0).lengthMinutes);
         this.minShifts = (int) Math.ceil((double)this.minTotalMinutes/(double)shifts.get(0).lengthMinutes);
@@ -118,7 +118,7 @@ public class Worker {
                      //   ", maxConsecutiveShifts=" + maxConsecutiveShifts + 
                      //   ", minConsecutiveShifts=" + minConsecutiveShifts + 
                     //    ", minConsecutiveDaysOff=" + minConsecutiveDaysOff + 
-                   //     ", maxWeekends=" + maxWeekends + 
+                   //     ", maxWorkWeekends=" + maxWorkWeekends + 
                   //      "\n canWorkShift=" + canWorkShift + 
                         "\n shiftOnRequest=" + shiftOnRequest + 
                         "\n shiftOffRequest=" + shiftOffRequest + 

@@ -11,7 +11,7 @@ import hmo.projekt.structures.schedule.WorkerSchedule;
  */
 public class Mutate {
     
-    private static final double PROBABILITY = 0.10;
+    private static final double PROBABILITY = 0.15;
     
     public void apply (StaffSchedule staffSchedule, PopulationGenerator generator, Instance instance) {
         

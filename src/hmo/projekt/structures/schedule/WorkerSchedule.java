@@ -16,15 +16,15 @@ public class WorkerSchedule {
     public int fitness;
     
 // pretpostavljam da će mi trebati kod zamjena dana
-    public int maxWeekends;
+    public int numberOfWorkWeekends;
     
     public int workload;
 
-    public WorkerSchedule(int[] schedule, int workerId, int maxWeekends, int workload) {
+    public WorkerSchedule(int[] schedule, int workerId, int numberOfWorkWeekends, int workload) {
         
         this.schedule = schedule;
         this.workerId = workerId;
-        this.maxWeekends = maxWeekends;
+        this.numberOfWorkWeekends = numberOfWorkWeekends;
         this.workload = workload;
     }
 
@@ -32,7 +32,7 @@ public class WorkerSchedule {
         
         this.schedule = workerSchedule.schedule;
         this.workerId = workerSchedule.workerId;
-        this.maxWeekends = workerSchedule.maxWeekends;
+        this.numberOfWorkWeekends = workerSchedule.numberOfWorkWeekends;
         this.workload = workerSchedule.workload;
         this.fitness = workerSchedule.fitness;
         

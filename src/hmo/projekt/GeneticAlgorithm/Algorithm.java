@@ -3,7 +3,6 @@ package hmo.projekt.GeneticAlgorithm;
 import hmo.projekt.Instance;
 import hmo.projekt.PopulationGenerator;
 import hmo.projekt.PrettyPrint;
-import hmo.projekt.structures.instance.Worker;
 import hmo.projekt.structures.schedule.StaffSchedule;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -18,12 +17,12 @@ public class Algorithm {
     
     
     // ukupana veličina populacije sa potomcima 
-    private final int POPULATION_SIZE = 100;
+    private final int POPULATION_SIZE = 500;
     // koliki postotak ukupne populacije će se križati, ostatak će biti odbačen
-    private final double SURVIVALE_RATE = 0.7;
+    private final double SURVIVALE_RATE = 0.90;
     private final int OPTIMAL_SOLUTION  = 0;
     // maksimalan broj iteracija bez poboljšanja
-    private final int MAX_ITERATIONS = 100;
+    private final int MAX_ITERATIONS = 10000;
     
     private final int NUMBER_OF_PARENTS;
     
@@ -57,17 +56,11 @@ public class Algorithm {
         }
         this.population.subList(this.NUMBER_OF_PARENTS, this.POPULATION_SIZE);
         Collections.sort(this.population);
-
-//        System.out.println("Total result: " + this.population.get(0).fitness + 
-//                " Staff result: " + this.population.get(0).staffFitness +
-//                " Shift result: " + this.population.get(0).shiftFitness
-//        );
-//        PrettyPrint.scheduleToFile(population.get(0), instance);
     }
     
     public void solve () {
         
-        int parent_1 = -1, parent_2 = -1;
+        int parent_1, parent_2;
         double totalFitness;
         double currFitness_1;
         double currFitness_2;
@@ -78,7 +71,6 @@ public class Algorithm {
             for (int i=0;i< population.size();i++){
                
                 totalFitness += (double) ((double) population.get(0).fitness/(double)population.get(i).fitness );
-                
             }
        //     System.out.println(totalFitness);
             
@@ -92,9 +84,6 @@ public class Algorithm {
                     currFitness_1 = (Math.random()*totalFitness);
                     currFitness_2 = (Math.random()*totalFitness);
                     
-             //       System.out.println("currFitness_1 " + currFitness_1);
-             //       System.out.println("currFitness_2 " + currFitness_2);
-                    
                     parent_1 = -1;
                     parent_2 = -1;
                     
@@ -103,8 +92,6 @@ public class Algorithm {
                         currFitness_1 -= (double)((double)population.get(0).fitness/(double)population.get(i).fitness );
                         currFitness_2 -= (double)((double)population.get(0).fitness/(double)population.get(i).fitness );
                         
-                 //       System.out.println("currFitness_1 " + currFitness_1);
-                //        System.out.println("currFitness_2 " + currFitness_2);
                         if (currFitness_1 <= 0 && parent_1 == -1) {
                             parent_1 = j;
                   //          System.out.println("parent_1 "  + parent_1);
@@ -123,17 +110,19 @@ public class Algorithm {
                 
                 this.crossover.apply(population.get(parent_1), population.get(parent_2), this.instance, offspring);
                 this.mutate.apply(offspring, generator, this.instance); 
-      //          offspring.calculateShiftCover(this.instance.shiftCover);
                 this.corrections.apply(offspring, instance);
-            //    this.corrections.balanceDayShifts(offspring, instance);
-     //           offspring.calculateShiftCover(this.instance.shiftCover);
-                offspring.calculateFitness(this.instance);
                 population.add(offspring);
                 
             }
             Collections.sort(population);
             population.subList(this.NUMBER_OF_PARENTS, this.POPULATION_SIZE).clear();
         }
+                    
+            System.out.println(" ******* Zapisujem rasporede u datoteke *******");
+            for(index = 1; index < 11 ; index ++) {
+                PrettyPrint.scheduleToFile(population.get(index-1), instance, "res-"+index+"-cepo.txt");
+            }
+        
     }
     
     private void dumpPopulationFitness(int count) {
@@ -162,115 +151,5 @@ public class Algorithm {
                 " Iteration: " + this.iteration);
     //    this.dumpPopulationFitness();
         return (bestFitness <= OPTIMAL_SOLUTION || this.iteration == 0 ) ;
-    }
-    
-    public static boolean isFeasible (int[] schedule, Instance instance, int workerId) {
-	// provjera jedne smjene dnevno nije potrebna, jer struktura ne dozvoljava vise od jedne	
-
-		// trenutni radnik
-			Worker worker = instance.staff.get(workerId);
-		
-		// broj radnih vikenda za trenutnog radnika
-			int workingWeekends = 0;
-			
-		// pronadi ukupno vrijeme rada za tog radnika
-			int totalMinutes = 0;
-		
-		// broj uzastopnih smjena
-			int consecutiveShifts = 0;
-		
-		// broj uzastopnih dana odmora
-			int consecutiveDaysOff = 0;
-		
-		// iteriraj po workerSchedules.schedule (po danima), svaka iteracija je jedan dan
-		// odnosno smjena koju je radnik odradio taj dan
-			for (int day = 0; day < schedule.length; day ++) {
-				int currentShift = schedule[day]; // trenutna smjena
-			
-			// ako nije rijec o zadnjem danu, provjeri da li je slijedeca smjena dozvoljena
-				if (day != (schedule.length - 1))
-				{
-					int followingShift = schedule[day+1]; // slijedeca smjena (iduci dan)
-					
-					// ako radnik nije radio taj ili slijedeci dan, nije potrebna provjera
-						if (currentShift != -1 && followingShift != -1)
-						{							
-						// provjeri da li se slijedeca smjena nalazi u listi smjena koje ne smiju slijediti trenutnoj smjeni
-							if (instance.shifts.get(currentShift).cantFollowShift != null && instance.shifts.get(currentShift).cantFollowShift.contains(followingShift))
-								return false;
-						}
-				}
-				
-			// radnik nije radio taj dan
-				if(currentShift == -1) {
-				// Pribroji uzastopnim danima odmora
-					consecutiveDaysOff++;
-					
-				// ako se dogodio prijelaz iz smjene u odmor
-					if (consecutiveShifts > 0)
-					{
-					// provjeri je li imao broj smjena manji od minimalnog ili veci od maksimalnog
-						if (consecutiveShifts < worker.minConsecutiveShifts || consecutiveShifts > worker.maxConsecutiveShifts)
-							return false;
-						
-					// ponisti trenutni broj uzastopnih smjena
-						consecutiveShifts = 0;
-					}	
-				}
-				
-			// radnik je radio taj dan
-				else {			
-				// ako je taj dan radio neku smjenu, pribroji njeno trajanje
-					totalMinutes += instance.shifts.get(currentShift).lengthMinutes;
-					
-				// provjeri je li ukupno vrijeme premasilo maksimum
-					if (totalMinutes > worker.maxTotalMinutes)
-						return false;
-
-				// provjeri da li se trenutna smjena nalazi u listi smjena koje taj radnik smije raditi
-					if (!worker.canWorkShift.contains(currentShift))
-						return false;
-
-				// provjeri da li se trenutni dan nalazi u listi slobodnih dana
-					if(worker.daysOff.contains(day))
-						return false;
-
-				// provjeri je li ovaj dan vikend
-					if (instance.weekendShiftsSaturday.contains(day) || instance.weekendShiftsSunday.contains(day)) {
-						workingWeekends++;
-
-					// provjeri je li radnik premasio maksimalni broj radnih vikenda
-						if (workingWeekends > worker.maxWeekends)
-							return false;
-					}
-					
-				// pribroji uzastopnim smjenama
-					consecutiveShifts++;
-					
-				// ako se dogodio prijelaz iz odmora u smjenu
-					if (consecutiveDaysOff > 0)
-					{
-					// provjeri je li imao dovoljno dana odmora, ako nije, rjesenje nije feasible
-						if (consecutiveDaysOff < worker.minConsecutiveDaysOff)
-							return false;
-						
-					// ponisti trenutni broj uzastopnih dana odmora
-						consecutiveDaysOff = 0;
-					}
-				}
-			}
-			
-		// provjeri je li ukupno vrijeme manje od minimalnog vremena
-			if (totalMinutes < worker.minTotalMinutes)
-				return false;
-			
-		// zadnji slijed uzastopnih smjena/dana odmora je ostao neprovjeren
-			if (consecutiveShifts > 0 && (consecutiveShifts < worker.minConsecutiveShifts || consecutiveShifts > worker.maxConsecutiveShifts))
-				return false;
-
-			if (consecutiveDaysOff > 0 && (consecutiveDaysOff < worker.minConsecutiveDaysOff))
-				return false;
-		
-        return true;
     }
 }
